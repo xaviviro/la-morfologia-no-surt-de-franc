@@ -1,9 +1,12 @@
 import pandas as pd
 
 from scripts.m06_figs import (
+    fig_condition_ladder,
     fig_delta_heatmap,
     fig_fertility_ratio,
+    fig_layer_robustness,
     fig_ment_delta_forest,
+    fig_morfessor_agreement,
     fig_placebo,
     fig_tokenization_examples,
 )
@@ -31,18 +34,45 @@ def _synth_metrics():
 
     rows = []
     for model, layers in GEOMETRY_MODELS.items():
-        L = layers[-1]
-        for fam in ("ment", "plural", "ly"):
-            for cond in ("native", "morphemic", "delta"):
-                row = {"model": model, "layer": L, "family": fam, "condition": cond,
-                       "direction_consistency": 0.1, "analogy_acc": 0.1,
-                       "pc1_var_ratio": 0.0, "n_pairs": 20}
-                if cond == "delta":
-                    row.update({"direction_consistency_ci_lo": 0.02,
-                                "direction_consistency_ci_hi": 0.18,
-                                "analogy_acc_ci_lo": -0.05, "analogy_acc_ci_hi": 0.15})
-                rows.append(row)
+        for L in layers:  # all layers, for cross-layer robustness figure
+            for fam in ("ment", "plural", "ly"):
+                for cond in ("native", "morphemic", "random", "morfessor",
+                             "delta", "delta_vs_random", "delta_morfessor"):
+                    row = {"model": model, "layer": L, "family": fam, "condition": cond,
+                           "direction_consistency": 0.1, "analogy_acc": 0.1,
+                           "pc1_var_ratio": 0.0, "n_pairs": 20}
+                    if cond.startswith("delta"):
+                        row.update({"direction_consistency_ci_lo": 0.02,
+                                    "direction_consistency_ci_hi": 0.18,
+                                    "direction_consistency_q": 0.01,
+                                    "analogy_acc_ci_lo": -0.05, "analogy_acc_ci_hi": 0.15,
+                                    "analogy_acc_q": 0.2})
+                    rows.append(row)
     return pd.DataFrame(rows)
+
+
+def test_fig_layer_robustness_writes_png(tmp_path):
+    p = tmp_path / "layers.png"
+    fig_layer_robustness(_synth_metrics(), "direction_consistency", p)
+    assert p.exists() and p.stat().st_size > 0
+
+
+def test_fig_condition_ladder_writes_png(tmp_path):
+    p = tmp_path / "ladder.png"
+    fig_condition_ladder(_synth_metrics(), "direction_consistency", p)
+    assert p.exists() and p.stat().st_size > 0
+
+
+def test_fig_morfessor_agreement_writes_png(tmp_path):
+    agree = pd.DataFrame({
+        "family": ["ment", "plural", "gem_lla", "ny", "cedilla"],
+        "derived": ["ràpidament", "gats", "col·legis", "anys", "places"],
+        "recall": [0.5, 1.0, 0.8, 0.3, 0.0], "precision": [0.5, 1.0, 0.8, 0.3, 0.0],
+        "n_pred_cuts": [1, 1, 1, 1, 0], "n_gold_cuts": [1, 1, 1, 1, 1],
+    })
+    p = tmp_path / "morf.png"
+    fig_morfessor_agreement(agree, p)
+    assert p.exists() and p.stat().st_size > 0
 
 
 def test_fig_fertility_ratio_writes_png(tmp_path):

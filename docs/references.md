@@ -63,8 +63,14 @@ tema. Per a cada bloc s'indica la relació amb el nostre estudi.
   tokenitzador basat en morfemes; un exemple del que anomenem tokenització
   "universal" conscient dels morfemes.
 - **Creutz & Lagus (2007).** *Unsupervised Models for Morpheme Segmentation and
-  Morphology Learning (Morfessor).* ACM TSLP — segmentador morfèmic no
-  supervisat; alternativa pràctica al nostre oracle de fronteres gold.
+  Morphology Learning.* ACM TSLP — el mètode **Morfessor** original.
+- **Virpioja, Smit, Grönroos & Kurimo (2013).** *Morfessor 2.0: Python
+  Implementation and Extensions for Morfessor Baseline.* Aalto University,
+  Report 25/2013.
+  [aaltodoc](https://aaltodoc.aalto.fi/handle/123456789/11836) — la
+  implementació que fem servir com a **segmentador realista no supervisat**
+  (condició `morfessor`), alternativa pràctica al nostre oracle de fronteres
+  gold.
 
 ## 4. Geometria de les representacions i subespais lineals
 

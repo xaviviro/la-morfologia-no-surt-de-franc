@@ -41,8 +41,12 @@ done
 # -> out/{slug}/embeddings_layer{L}.npz + metadata.parquet  (per model)
 ```
 
-Cada model escriu vectors de forma `(1276, hidden)` per capa, on
-`1276 = 319 parells × 2 condicions (nadiu/morfèmic) × 2 rols (base/derivat)`.
+Cada model escriu vectors per capa amb 4 condicions de segmentació × 2 rols
+(base/derivat): **nadiu**, **morfèmic** (oracle), **aleatori** (placebo) i
+**Morfessor** (segmentador realista no supervisat, entrenat al vol sobre les
+paraules del lèxic). `m03` entrena Morfessor automàticament; per generar només
+la taula de concordança Morfessor↔gold pots executar
+`uv run python scripts/morf_seg.py`.
 
 ## 4. Mètriques de geometria (RQ2/RQ3)
 
@@ -66,9 +70,10 @@ uv run python scripts/m06_figs.py   # figures explicatives extra
 | `m01_build_lexicon.py` | (llistes curades) | `data/morph_pairs.csv` | no |
 | `m02_tokenize_audit.py` | lèxic | `out/tokenize_audit.csv` | no |
 | `m03_extract.py` | lèxic | `out/{slug}/*.npz` + `metadata.parquet` | sí |
-| `m04_geometry.py` | npz + metadata | `out/geometry_metrics.csv` | no |
+| `m04_geometry.py` | npz + metadata | `out/geometry_metrics.csv`, `out/geometry_aggregate_ci.csv` | no |
 | `m05_figs.py` | auditoria + mètriques + npz | `out/figs/*.png` | no |
 | `m06_figs.py` | auditoria + mètriques + tokenitzadors | `out/figs/*.png` (extra) | no |
+| `morf_seg.py` | lèxic | `out/morfessor_agreement.csv` | no |
 
 La lògica pura viu a `scripts/geom_lib.py` (mètriques de geometria) i
 `scripts/embed_lib.py` (ajudes de tokenització + extracció), totes dues

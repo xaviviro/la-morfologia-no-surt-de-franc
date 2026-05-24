@@ -22,6 +22,8 @@ from scripts.embed_lib import (
     random_split,
     slugify,
 )
+from scripts.morf_seg import segment as morf_segment
+from scripts.morf_seg import train_morfessor
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -39,7 +41,8 @@ def _split_carrier(carrier: str) -> tuple[str, str]:
     return prefix, suffix
 
 
-def extract_pair(tok, model, carrier, base, derived, gold_segmentation, layers):
+def extract_pair(tok, model, carrier, base, derived, gold_segmentation, layers,
+                 morf_model=None):
     prefix, suffix = _split_carrier(carrier)
     morphs = gold_segmentation.split("|")
     out: dict[tuple[str, str, int], np.ndarray] = {}
@@ -58,6 +61,13 @@ def extract_pair(tok, model, carrier, base, derived, gold_segmentation, layers):
     ids_dr, span_dr = assemble_ids(tok, prefix, rand_pieces, suffix)
     der_rand = embed_span(model, ids_dr, span_dr, layers)
 
+    # realistic unsupervised segmenter (Morfessor) — present only if a model is given
+    der_morf = None
+    if morf_model is not None:
+        morf_pieces = morf_segment(morf_model, derived) or [derived]
+        ids_df, span_df = assemble_ids(tok, prefix, morf_pieces, suffix)
+        der_morf = embed_span(model, ids_df, span_df, layers)
+
     for L in layers:
         out[("native", "base", L)] = base_vecs[L]
         out[("morphemic", "base", L)] = base_vecs[L]  # base shared across conditions
@@ -65,6 +75,9 @@ def extract_pair(tok, model, carrier, base, derived, gold_segmentation, layers):
         out[("native", "derived", L)] = der_native[L]
         out[("morphemic", "derived", L)] = der_morph[L]
         out[("random", "derived", L)] = der_rand[L]
+        if der_morf is not None:
+            out[("morfessor", "base", L)] = base_vecs[L]
+            out[("morfessor", "derived", L)] = der_morf[L]
     return out
 
 
@@ -89,12 +102,14 @@ def main() -> None:
     df = pd.read_csv(ROOT / "data" / "morph_pairs.csv")
     tok, model = load_model_and_tokenizer(args.model)
 
+    morf_model = train_morfessor(sorted(set(df["base"]) | set(df["derived"])))
+
     per_layer: dict[int, list[np.ndarray]] = {L: [] for L in layers}
     meta_rows: list[dict] = []
     for r in df.itertuples():
         pair = extract_pair(tok, model, r.carrier, r.base, r.derived,
-                            r.gold_segmentation, layers)
-        for cond in ("native", "morphemic", "random"):
+                            r.gold_segmentation, layers, morf_model=morf_model)
+        for cond in ("native", "morphemic", "random", "morfessor"):
             for role in ("base", "derived"):
                 for L in layers:
                     per_layer[L].append(pair[(cond, role, L)])

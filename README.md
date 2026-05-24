@@ -16,7 +16,7 @@ protagonista.
 
 Hem mesurat com els tokenitzadors dels grans models de llenguatge tallen la
 morfologia catalana, i hem provat si imposar les fronteres morfèmiques
-correctes recupera estructura composicional. Quatre resultats:
+correctes recupera estructura composicional. Cinc resultats:
 
 1. **El català es fragmenta molt més que l'anglès.** Als models
    anglo-dominants (Gemma, Qwen, Mistral) una paraula catalana costa **~1,7×**
@@ -42,6 +42,12 @@ correctes recupera estructura composicional. Quatre resultats:
    tokenitzadors aïllen el `·` com a token propi; ni tan sols el tokenitzador
    català-aware ho comprimeix. La `ç` i el dígraf `ny` afegeixen un càstig
    menor.
+
+5. **No cal un oracle.** Un segmentador morfèmic realista i no supervisat
+   (Morfessor) gairebé iguala l'oracle en la millora geomètrica, i el guany es
+   manté a totes les profunditats de capa. El control placebo (tall aleatori)
+   *empitjora* la geometria, confirmant que la millora és específica dels
+   morfemes.
 
 > Els models del BSC (Salamandra / ALIA) s'inclouen com a control
 > *català-aware* i es descriuen de manera neutra al llarg de tot l'estudi.
@@ -105,6 +111,24 @@ que exclou el zero — i la segmentació aleatòria *empitjora* la geometria per
 sota de la nativa. El guany és **específic dels morfemes**, no de trossejar.
 Les significacions per cel·la dels mapes de calor estan corregides per
 comparacions múltiples (Benjamini–Hochberg FDR).
+
+### No cal un oracle: un segmentador realista (Morfessor) ja n'hi ha prou
+
+![Escala de segmentació](out/figs/condition_ladder.png)
+
+L'oracle és el sostre teòric. Un **Morfessor** no supervisat (que mai veu les
+fronteres gold i només n'encerta el ~54 %) **gairebé iguala l'oracle** en
+geometria, i el seu guany exclou el zero en els 5 models. La lectura pràctica:
+no cal una segmentació perfecta — una de raonable ja exposa la composicionalitat.
+L'escala és nítida: nadiu (0,52) → aleatori cau (0,45) → Morfessor (0,59) ≈
+oracle (0,60).
+
+### Robustesa entre capes
+
+![Robustesa entre capes](out/figs/layer_robustness.png)
+
+El guany morfèmic és **positiu a les tres profunditats de capa** en els cinc
+models, no és un artefacte de triar una capa concreta.
 
 ### El sufix protagonista: `-ment`
 

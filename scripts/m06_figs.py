@@ -23,6 +23,7 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
 from scripts.embed_lib import gold_boundaries  # noqa: E402
+from scripts.geom_lib import bootstrap_mean_ci  # noqa: E402
 from scripts.labels_ca import (  # noqa: E402
     COND_CA,
     GROUP_ANGLO,
@@ -305,6 +306,99 @@ def fig_ment_summary(metrics: pd.DataFrame, path: Path) -> None:
     plt.close()
 
 
+def fig_layer_robustness(metrics: pd.DataFrame, metric: str, path: Path) -> None:
+    """Δ (morfèmic − nadiu) per capa, per model, amb banda d'IC 95% — mostra que
+    el guany no depèn d'una sola tria de capa."""
+    from scripts.m04_geometry import CA_FAMILIES, GEOMETRY_MODELS
+
+    d = metrics[metrics.condition == "delta"].copy()
+    d = d[d.family.isin(CA_FAMILIES)]
+    fig, ax = plt.subplots(figsize=(10, 6))
+    cmap = plt.get_cmap("tab10")
+    for i, (model, layers) in enumerate(GEOMETRY_MODELS.items()):
+        xs, ys, los, his = [], [], [], []
+        for depth, L in enumerate(layers):
+            sub = d[(d.model == model) & (d.layer == L)]
+            if not len(sub):
+                continue
+            xs.append(depth)
+            ys.append(sub[metric].mean())
+            los.append(sub[f"{metric}_ci_lo"].mean())
+            his.append(sub[f"{metric}_ci_hi"].mean())
+        ys = np.array(ys)
+        ax.plot(xs, ys, "-o", color=cmap(i), label=short_model(model))
+        ax.fill_between(xs, los, his, color=cmap(i), alpha=0.15)
+    ax.axhline(0, color="black", lw=1, ls="--")
+    ax.set_xticks([0, 1, 2], ["superficial (25%)", "mitjana (60%)", "profunda (90%)"])
+    ax.set_xlabel("profunditat de capa")
+    ax.set_ylabel(f"Δ {METRIC_CA.get(metric, metric)} (morfèmic − nadiu, mitjana famílies CA)")
+    ax.set_title("Robustesa entre capes: la millora morfèmica es manté a tota la profunditat")
+    ax.legend()
+    plt.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+
+def fig_condition_ladder(metrics: pd.DataFrame, metric: str, path: Path) -> None:
+    """Escala de segmentació: consistència de direcció absoluta per condició
+    (nadiu → Morfessor realista → aleatori → morfèmic oracle), mitjana sobre
+    famílies CA i models, a la capa més profunda."""
+    from scripts.m04_geometry import CA_FAMILIES, GEOMETRY_MODELS
+
+    deep = {m: ls[-1] for m, ls in GEOMETRY_MODELS.items()}
+    order = [("native", "nadiu"), ("random", "aleatori"),
+             ("morfessor", "Morfessor (realista)"), ("morphemic", "morfèmic (oracle)")]
+    means, los, his, labels = [], [], [], []
+    for cond, label in order:
+        vals = []
+        for model in GEOMETRY_MODELS:
+            sub = metrics[(metrics.model == model) & (metrics.layer == deep[model])
+                          & (metrics.condition == cond) & (metrics.family.isin(CA_FAMILIES))]
+            vals.extend(sub[metric].dropna().tolist())
+        if not vals:
+            continue
+        m, lo, hi = bootstrap_mean_ci(np.array(vals), n=1000, seed=0)
+        means.append(m)
+        los.append(lo)
+        his.append(hi)
+        labels.append(label)
+    x = np.arange(len(labels))
+    colors = ["#bdbdbd", "#d95f02", "#7570b3", "#1b9e77"][: len(labels)]
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+    err = np.vstack([np.array(means) - np.array(los), np.array(his) - np.array(means)])
+    ax.bar(x, means, yerr=err, capsize=5, color=colors)
+    ax.set_xticks(x, labels, rotation=15)
+    ax.set_ylabel(METRIC_CA.get(metric, metric))
+    ax.set_title("Escala de segmentació: com de composicional és cada manera de tallar\n"
+                 "(mitjana famílies CA × models, capa profunda, IC 95%)")
+    plt.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+
+def fig_morfessor_agreement(agree: pd.DataFrame, path: Path) -> None:
+    """Recall de Morfessor vs les fronteres gold, per família (què recupera un
+    segmentador realista no supervisat)."""
+    g = agree.groupby("family")["recall"].mean()
+    ca_order = ["ment", "dim_et", "agent_dor", "nom_cio", "plural", "verb_em",
+                "gender_a", "gem_lla", "cedilla", "ny"]
+    fams = [f for f in ca_order if f in g.index]
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.bar(range(len(fams)), [g[f] for f in fams], color="#7570b3")
+    ax.axhline(g.mean(), color="black", ls="--", lw=1, label=f"mitjana = {g.mean():.2f}")
+    ax.set_xticks(range(len(fams)), [fam_label(f) for f in fams], rotation=45, ha="right")
+    ax.set_ylim(0, 1)
+    ax.set_ylabel("recall de frontera vs gold")
+    ax.set_title("Què recupera Morfessor (segmentador realista no supervisat) per família")
+    ax.legend()
+    plt.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+
 def main() -> None:
     from transformers import AutoTokenizer
 
@@ -318,11 +412,18 @@ def main() -> None:
     fig_delta_heatmap(metrics, "analogy_acc", FIGS / "delta_heatmap_analogy.png")
     fig_ment_summary(metrics, FIGS / "ment_summary.png")
     fig_ment_delta_forest(metrics, FIGS / "ment_delta_forest.png")
+    fig_layer_robustness(metrics, "direction_consistency", FIGS / "layer_robustness.png")
+    if "morfessor" in set(metrics.condition):
+        fig_condition_ladder(metrics, "direction_consistency", FIGS / "condition_ladder.png")
 
     agg_path = ROOT / "out" / "geometry_aggregate_ci.csv"
     if agg_path.exists():
         agg = pd.read_csv(agg_path)
         fig_placebo(agg, "direction_consistency", FIGS / "placebo_control.png")
+
+    morf_path = ROOT / "out" / "morfessor_agreement.csv"
+    if morf_path.exists():
+        fig_morfessor_agreement(pd.read_csv(morf_path), FIGS / "morfessor_agreement.png")
 
     examples = [
         ("ràpidament", "ràpida|ment"),

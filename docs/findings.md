@@ -217,6 +217,43 @@ que exclou el zero en **els 11 tokenitzadors** (DeepSeek-67B +1,21 [+1,08, +1,33
 a dalt; els BSC ~+0,57 [+0,46, +0,69] a baix), confirmant §1 amb incertesa
 (`out/fertility_gap_ci.csv`).
 
+## 8. Un segmentador realista (Morfessor) ja recupera gairebé tot el guany
+
+L'oracle és el sostre teòric. Per saber què en recuperaria una eina
+**desplegable**, afegim un **Morfessor** no supervisat (entrenat només sobre les
+cadenes del lèxic, mai veu les fronteres gold). Recupera el **53,8 %** de les
+fronteres morfèmiques (precisió 52,5 %; `out/morfessor_agreement.csv`,
+`out/figs/morfessor_agreement.png`) — un segmentador a mig camí entre el nadiu
+(0 %) i l'oracle (100 %).
+
+Tot i així, geomètricament gairebé **iguala l'oracle**. `Δ consistència de
+direcció` (Morfessor − nadiu) vs (oracle − nadiu), mitjana famílies CA, IC 95 %:
+
+| model | oracle − nadiu | Morfessor − nadiu |
+| --- | --- | --- |
+| `gemma-2-2b` | +0,088 [+0,045, +0,136] | +0,080 [+0,040, +0,127] |
+| `gemma-4-E2B` | +0,029 [−0,011, +0,070] | **+0,054 [+0,020, +0,092]** |
+| `Qwen2-1.5B` | +0,026 [−0,032, +0,080] | **+0,047 [+0,012, +0,087]** |
+| `Qwen3.5-4B-Base` | +0,054 [+0,024, +0,089] | +0,051 [+0,022, +0,085] |
+| `salamandra-2b` | +0,181 [+0,127, +0,218] | +0,124 [+0,091, +0,155] |
+
+El **delta de Morfessor exclou el zero en els cinc models** — fins i tot a
+`gemma-4-E2B` i `Qwen2-1.5B`, on l'oracle no arribava a la significació. La
+lectura pràctica és forta: **no cal una segmentació morfològicament perfecta**;
+un segmentador no supervisat estàndard ja exposa la major part de l'estructura
+composicional. L'escala de segmentació
+(`out/figs/condition_ladder.png`) ho resumeix: nadiu (0,52) → **aleatori cau a
+0,45** → Morfessor (0,59) ≈ oracle (0,60).
+
+## 9. Robustesa entre capes
+
+El guany no depèn de la tria de capa. `Δ (oracle − nadiu)` de consistència de
+direcció (mitjana famílies CA) és **positiu a les tres profunditats escombrades
+en els cinc models** (p. ex. `gemma-2-2b` L6 +0,124 → L15 +0,090 → L22 +0,088;
+`salamandra-2b` L6 +0,221 → L21 +0,181), amb una lleugera disminució en
+profunditat però sense canviar de signe (`out/figs/layer_robustness.png`). Els
+IC i p-valors es calculen ara a totes les capes, no només a la més profunda.
+
 ---
 
 ## Titular

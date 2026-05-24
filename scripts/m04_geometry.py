@@ -42,7 +42,12 @@ GEOMETRY_MODELS = {
 }
 CA_FAMILIES = ["ment", "dim_et", "agent_dor", "nom_cio", "plural", "verb_em",
                "gender_a", "gem_lla", "cedilla", "ny"]
-DELTAS = {"delta": "native", "delta_vs_random": "random"}
+# delta name -> (minuend condition, reference condition)
+DELTAS = {
+    "delta": ("morphemic", "native"),            # oracle vs native
+    "delta_vs_random": ("morphemic", "random"),  # placebo: morpheme-specific?
+    "delta_morfessor": ("morfessor", "native"),  # realistic segmenter vs native
+}
 METRICS = ["direction_consistency", "analogy_acc"]
 N_BOOT = 1000
 
@@ -76,10 +81,10 @@ def main() -> None:
             print(f"SKIP {model_id}: no extraction artifacts")
             continue
         meta = pd.read_parquet(mdir / "metadata.parquet")
-        conditions = [c for c in ("native", "morphemic", "random") if c in set(meta.condition)]
+        present = set(meta.condition)
+        conditions = [c for c in ("native", "morphemic", "random", "morfessor") if c in present]
         for L in layers:
             vecs = np.load(mdir / f"embeddings_layer{L}.npz")["vectors"]
-            is_deep = L == layers[-1]
             for family in sorted(meta.family.unique()):
                 mats, mets = {}, {}
                 for cond in conditions:
@@ -90,22 +95,22 @@ def main() -> None:
                                  "condition": cond, **mets[cond]})
                 base = mats["native"][0]
                 der = {c: mats[c][1] for c in mats}
-                for name, ref in DELTAS.items():
-                    if ref not in mets:
+                for name, (minu, ref) in DELTAS.items():
+                    if minu not in mets or ref not in mets:
                         continue
                     drow = {
                         "model": model_id, "layer": L, "family": family, "condition": name,
-                        "direction_consistency": mets["morphemic"]["direction_consistency"]
+                        "direction_consistency": mets[minu]["direction_consistency"]
                         - mets[ref]["direction_consistency"],
-                        "analogy_acc": mets["morphemic"]["analogy_acc"] - mets[ref]["analogy_acc"],
-                        "pc1_var_ratio": mets["morphemic"]["pc1_var_ratio"]
-                        - mets[ref]["pc1_var_ratio"],
+                        "analogy_acc": mets[minu]["analogy_acc"] - mets[ref]["analogy_acc"],
+                        "pc1_var_ratio": mets[minu]["pc1_var_ratio"] - mets[ref]["pc1_var_ratio"],
                         "n_pairs": mets["native"]["n_pairs"],
                     }
-                    if is_deep and len(base) > 1:
-                        dl, dh, dp = bootstrap_delta_ci_p(_dir_stat, base, der["morphemic"],
+                    # CI + p at EVERY layer (cross-layer robustness)
+                    if len(base) > 1:
+                        dl, dh, dp = bootstrap_delta_ci_p(_dir_stat, base, der[minu],
                                                           der[ref], n=N_BOOT, seed=0)
-                        cm = analogy_correct_per_pair(base, der["morphemic"])
+                        cm = analogy_correct_per_pair(base, der[minu])
                         cr = analogy_correct_per_pair(base, der[ref])
                         al, ah, ap = paired_bootstrap_ci_p(cm, cr, n=N_BOOT, seed=0)
                     else:

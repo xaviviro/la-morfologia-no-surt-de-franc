@@ -8,6 +8,7 @@ authors = [{ name = "Xavier Vinaixa Roselló", email = "xavi@sorensen.ai" }]
 dependencies = [
     "accelerate>=1.0",
     "matplotlib>=3.9",
+    "morfessor>=2.0.6",
     "numpy>=1.26",
     "pandas>=2.2",
     "pyarrow>=17",

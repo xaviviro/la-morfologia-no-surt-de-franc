@@ -125,6 +125,13 @@ portadora `PREFIX {w} SUFIX`, muntem els `input_ids` així:
   morfema** (llavor determinista per paraula). És el control que distingeix
   "alinear amb els morfemes" de "trossejar diferent": si la morfèmica només
   supera la nadiua però no l'aleatòria, el guany no és específic dels morfemes.
+- **Condició Morfessor (segmentador realista):** un model **Morfessor Baseline
+  no supervisat** (`corpusweight=1.0`, `scripts/morf_seg.py`) entrenat només
+  sobre les *cadenes* del lèxic (mai veu les fronteres gold). És la contrapart
+  desplegable de l'oracle: ens diu què recuperaria un tokenitzador morfèmic
+  pràctic, no només el sostre teòric. El pes de corpus 1,0 s'ha triat perquè
+  pesos més baixos sobre-segmenten a caràcters i més alts deixen les paraules
+  senceres.
 
 La primera peça es tokenitza amb un espai al davant perquè tant la família
 SentencePiece (`▁`) com la BPE de nivell de byte (`Ġ`) rebin el marcador
@@ -178,14 +185,17 @@ Per als vectors de desplaçament d'una família `o_i = v(derivat_i) − v(base_i
 Les tres es computen per `(model, capa, família, condició)` per a **nadiu**,
 **morfèmic** i **aleatori**, més **dos deltes** a la capa més profunda:
 
-- `delta = morfèmic − nadiu` — ajuda la segmentació morfèmica respecte a la
-  nadiua?
+- `delta = morfèmic − nadiu` — ajuda la segmentació morfèmica (oracle) respecte
+  a la nadiua?
 - `delta_vs_random = morfèmic − aleatori` — el guany és **específic dels
   morfemes** o l'obté qualsevol re-segmentació? (control placebo)
+- `delta_morfessor = Morfessor − nadiu` — quant del guany de l'oracle recupera
+  un segmentador realista no supervisat?
 
-**Intervals de confiança i p-valors.** A cada delta de la capa més profunda
-adjuntem un **IC 95 % per bootstrap (1000 rèpliques)** i un **p-valor
-bilateral** (columnes `*_ci_lo`/`*_ci_hi`/`*_p` de `out/geometry_metrics.csv`):
+**Intervals de confiança i p-valors.** A cada delta i **a totes les capes
+escombrades** (robustesa entre capes) adjuntem un **IC 95 % per bootstrap
+(1000 rèpliques)** i un **p-valor bilateral** (columnes
+`*_ci_lo`/`*_ci_hi`/`*_p` de `out/geometry_metrics.csv`):
 
 - **Consistència de direcció:** es re-mostregen els parells amb reemplaçament i
   es recalcula l'estadístic de família amb els mateixos índexs (aparellat)
