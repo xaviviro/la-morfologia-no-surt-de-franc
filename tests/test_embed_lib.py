@@ -8,7 +8,24 @@ from scripts.embed_lib import (
     char_span_to_token_span,
     fertility,
     assemble_ids,
+    random_split,
 )
+
+
+def test_random_split_joins_to_word_and_avoids_gold():
+    # "ràpidament" gold boundary at 6; random split into 2 pieces must avoid 6
+    pieces = random_split("ràpidament", [6], 2)
+    assert len(pieces) == 2
+    assert "".join(pieces) == "ràpidament"
+    assert len(pieces[0]) != 6  # cut is not at the gold boundary
+
+
+def test_random_split_is_deterministic():
+    assert random_split("muntanyes", [6], 2) == random_split("muntanyes", [6], 2)
+
+
+def test_random_split_single_piece_when_native():
+    assert random_split("gat", [], 1) == ["gat"]
 
 
 def test_gold_boundaries_internal_positions():

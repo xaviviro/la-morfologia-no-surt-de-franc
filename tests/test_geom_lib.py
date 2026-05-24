@@ -8,6 +8,10 @@ from scripts.geom_lib import (
     analogy_correct_per_pair,
     paired_bootstrap_ci,
     bootstrap_delta_ci,
+    bootstrap_delta_ci_p,
+    paired_bootstrap_ci_p,
+    bootstrap_mean_ci,
+    benjamini_hochberg,
 )
 
 
@@ -93,3 +97,57 @@ def test_bootstrap_delta_ci_brackets_zero_when_identical():
 
     lo, hi = bootstrap_delta_ci(stat, base, der, der, n=400, seed=3)
     assert lo <= 0.0 <= hi  # identical conditions → delta ≈ 0
+
+
+def test_bootstrap_delta_ci_p_small_when_morph_cleaner():
+    rng = np.random.default_rng(0)
+    base = rng.normal(size=(30, 8))
+    der_a = base + np.ones(8)                 # clean direction
+    der_b = base + rng.normal(size=(30, 8))   # noisy direction
+
+    def stat(b, d):
+        return direction_consistency(d - b)
+
+    lo, hi, p = bootstrap_delta_ci_p(stat, base, der_a, der_b, n=400, seed=1)
+    assert lo > 0.0 and p < 0.05
+
+
+def test_bootstrap_delta_ci_p_large_when_identical():
+    rng = np.random.default_rng(2)
+    base = rng.normal(size=(30, 8))
+    der = base + rng.normal(size=(30, 8))
+
+    def stat(b, d):
+        return direction_consistency(d - b)
+
+    lo, hi, p = bootstrap_delta_ci_p(stat, base, der, der, n=400, seed=3)
+    assert lo <= 0.0 <= hi and p > 0.2
+
+
+def test_paired_bootstrap_ci_p_small_when_shifted():
+    rng = np.random.default_rng(4)
+    a = rng.normal(0.5, 0.05, size=40)
+    b = a - 0.1 + rng.normal(0, 0.01, size=40)
+    lo, hi, p = paired_bootstrap_ci_p(a, b, n=1000, seed=0)
+    assert lo > 0.0 and p < 0.05
+
+
+def test_bootstrap_mean_ci_brackets_mean():
+    rng = np.random.default_rng(5)
+    vals = rng.normal(0.1, 0.05, size=12)
+    mean, lo, hi = bootstrap_mean_ci(vals, n=1000, seed=0)
+    assert mean == pytest.approx(vals.mean())
+    assert lo < mean < hi
+
+
+def test_benjamini_hochberg_monotone_and_ge_p():
+    p = np.array([0.001, 0.01, 0.02, 0.5, 0.8])
+    q = benjamini_hochberg(p)
+    assert np.all(q >= p - 1e-9)          # q-values are >= raw p
+    assert np.all(np.diff(q) >= -1e-9)    # non-decreasing in p order
+    assert np.all((q >= 0) & (q <= 1))
+
+
+def test_benjamini_hochberg_preserves_nan():
+    q = benjamini_hochberg([0.01, np.nan, 0.04])
+    assert np.isnan(q[1]) and not np.isnan(q[0])

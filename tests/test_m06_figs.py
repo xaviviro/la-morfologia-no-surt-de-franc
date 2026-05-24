@@ -4,8 +4,26 @@ from scripts.m06_figs import (
     fig_delta_heatmap,
     fig_fertility_ratio,
     fig_ment_delta_forest,
+    fig_placebo,
     fig_tokenization_examples,
 )
+
+
+def _synth_aggregate():
+    fams = ["ment", "plural", "gem_lla", "cedilla", "ny"]
+    rows = []
+    for cond in ("delta", "delta_vs_random"):
+        for f in fams:
+            rows.append({"scope": "family", "key": f, "condition": cond,
+                         "metric": "direction_consistency", "mean": 0.08,
+                         "ci_lo": 0.02, "ci_hi": 0.14, "n": 5})
+    return pd.DataFrame(rows)
+
+
+def test_fig_placebo_writes_png(tmp_path):
+    p = tmp_path / "placebo.png"
+    fig_placebo(_synth_aggregate(), "direction_consistency", p)
+    assert p.exists() and p.stat().st_size > 0
 
 
 def _synth_metrics():

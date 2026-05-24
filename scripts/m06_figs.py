@@ -153,7 +153,7 @@ def fig_tokenization_examples(examples: list[tuple[str, str]],
 
 def fig_delta_heatmap(metrics: pd.DataFrame, metric: str, path: Path) -> None:
     """Mapa de calor model×família del delta morfèmic-nadiu (vermell=pitjor, blau=millor).
-    Un asterisc marca les cel·les on l'IC 95% (bootstrap) exclou el zero."""
+    Un asterisc marca les cel·les significatives després de la correcció FDR (q<0,05)."""
     from scripts.m04_geometry import GEOMETRY_MODELS
 
     d = metrics[metrics.condition == "delta"].copy()
@@ -173,8 +173,7 @@ def fig_delta_heatmap(metrics: pd.DataFrame, metric: str, path: Path) -> None:
 
     piv = _piv(metric)
     cols = list(piv.columns)
-    lo = _piv(f"{metric}_ci_lo") if f"{metric}_ci_lo" in d.columns else None
-    hi = _piv(f"{metric}_ci_hi") if f"{metric}_ci_hi" in d.columns else None
+    qp = _piv(f"{metric}_q") if f"{metric}_q" in d.columns else None
     ylabels = [short_model(m) for m in piv.index]
     vmax = float(np.nanmax(np.abs(piv.values))) or 1.0
     fig, ax = plt.subplots(figsize=(11, 4.5))
@@ -188,14 +187,46 @@ def fig_delta_heatmap(metrics: pd.DataFrame, metric: str, path: Path) -> None:
             if np.isnan(v):
                 continue
             sig = ""
-            if lo is not None and hi is not None:
-                lij, hij = lo.values[i, j], hi.values[i, j]
-                if not np.isnan(lij) and (lij > 0 or hij < 0):
+            if qp is not None:
+                qij = qp.values[i, j]
+                if not np.isnan(qij) and qij < 0.05:
                     sig = "*"
             ax.text(j, i, f"{v:+.2f}{sig}", ha="center", va="center", fontsize=7, color="black")
     fig.colorbar(im, ax=ax, label=f"Δ {METRIC_CA.get(metric, metric)} (morfèmic − nadiu)")
     ax.set_title(f"Ajuda la segmentació morfèmica?  Δ {METRIC_CA.get(metric, metric)}\n"
-                 "blau = millor · esquerra de la línia = català · * = IC 95% exclou el 0")
+                 "blau = millor · esquerra de la línia = català · * = significatiu (FDR q<0,05)")
+    plt.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+
+def fig_placebo(agg: pd.DataFrame, metric: str, path: Path) -> None:
+    """Control placebo: per família catalana, Δ(morfèmic − nadiu) vs
+    Δ(morfèmic − aleatori) amb IC 95%. Si el segon és > 0, el guany és
+    específic dels morfemes, no de trossejar diferent."""
+    ca_order = ["ment", "dim_et", "agent_dor", "nom_cio", "plural", "verb_em",
+                "gender_a", "gem_lla", "cedilla", "ny"]
+    fam = agg[(agg.scope == "family") & (agg.metric == metric)]
+    fams = [f for f in ca_order if f in set(fam.key)]
+    y = np.arange(len(fams))
+    fig, ax = plt.subplots(figsize=(10, 6))
+    specs = [("delta", "morfèmic − nadiu", "#1b9e77", -0.16),
+             ("delta_vs_random", "morfèmic − aleatori (placebo)", "#7570b3", +0.16)]
+    for cond, label, color, off in specs:
+        sub = fam[fam.condition == cond].set_index("key")
+        means = np.array([sub.loc[f, "mean"] for f in fams])
+        lo = np.array([sub.loc[f, "ci_lo"] for f in fams])
+        hi = np.array([sub.loc[f, "ci_hi"] for f in fams])
+        xerr = np.vstack([np.clip(means - lo, 0, None), np.clip(hi - means, 0, None)])
+        ax.errorbar(means, y + off, xerr=xerr, fmt="o", color=color, ecolor=color,
+                    capsize=3, ms=6, label=label)
+    ax.axvline(0, color="black", lw=1, ls="--")
+    ax.set_yticks(y, [fam_label(f) for f in fams])
+    ax.invert_yaxis()
+    ax.set_xlabel(f"Δ {METRIC_CA.get(metric, metric)} (mitjana entre models, IC 95%)")
+    ax.set_title("Control placebo: la segmentació morfèmica supera la segmentació aleatòria?")
+    ax.legend(loc="lower right")
     plt.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(path, dpi=150)
@@ -287,6 +318,11 @@ def main() -> None:
     fig_delta_heatmap(metrics, "analogy_acc", FIGS / "delta_heatmap_analogy.png")
     fig_ment_summary(metrics, FIGS / "ment_summary.png")
     fig_ment_delta_forest(metrics, FIGS / "ment_delta_forest.png")
+
+    agg_path = ROOT / "out" / "geometry_aggregate_ci.csv"
+    if agg_path.exists():
+        agg = pd.read_csv(agg_path)
+        fig_placebo(agg, "direction_consistency", FIGS / "placebo_control.png")
 
     examples = [
         ("ràpidament", "ràpida|ment"),

@@ -94,6 +94,18 @@ lectura: el guany d'analogia de Salamandra-2B és clarament significatiu
 (+0,33), com també la regressió de Gemma-4-E2B (−0,23); moltes altres cel·les
 són positives de mitjana però el seu IC creua el zero.
 
+### Rigor: és específic dels morfemes? (control placebo)
+
+![Control placebo: morfèmic vs aleatori](out/figs/placebo_control.png)
+
+Per descartar que *qualsevol* re-segmentació millori la geometria, comparem la
+morfèmica amb una segmentació **aleatòria** (mateix nombre de peces, tall no
+morfèmic). En els **cinc models** la morfèmica supera l'aleatòria amb IC 95 %
+que exclou el zero — i la segmentació aleatòria *empitjora* la geometria per
+sota de la nativa. El guany és **específic dels morfemes**, no de trossejar.
+Les significacions per cel·la dels mapes de calor estan corregides per
+comparacions múltiples (Benjamini–Hochberg FDR).
+
 ### El sufix protagonista: `-ment`
 
 ![El sufix -ment: nadiu vs morfèmic](out/figs/ment_summary.png)
@@ -159,6 +171,7 @@ entrenat amb una proporció no trivial de català.
 | els resultats + xifres | [`docs/findings.md`](docs/findings.md) |
 | què **no** afirma l'estudi | [`docs/limitations.md`](docs/limitations.md) |
 | com regenerar-ho tot | [`docs/reproduce.md`](docs/reproduce.md) |
+| treball relacionat i referències | [`docs/references.md`](docs/references.md) |
 
 > Tota la documentació (README, `docs/`) i el text dels gràfics són en català.
 

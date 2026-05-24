@@ -14,7 +14,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from scripts.embed_lib import assemble_ids, embed_span, load_model_and_tokenizer, slugify
+from scripts.embed_lib import (
+    assemble_ids,
+    embed_span,
+    gold_boundaries,
+    load_model_and_tokenizer,
+    random_split,
+    slugify,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -46,11 +53,18 @@ def extract_pair(tok, model, carrier, base, derived, gold_segmentation, layers):
     ids_dm, span_dm = assemble_ids(tok, prefix, morphs, suffix)
     der_morph = embed_span(model, ids_dm, span_dm, layers)
 
+    # placebo control: same number of pieces, but cut at a random non-morpheme boundary
+    rand_pieces = random_split(derived, gold_boundaries(gold_segmentation), len(morphs))
+    ids_dr, span_dr = assemble_ids(tok, prefix, rand_pieces, suffix)
+    der_rand = embed_span(model, ids_dr, span_dr, layers)
+
     for L in layers:
         out[("native", "base", L)] = base_vecs[L]
         out[("morphemic", "base", L)] = base_vecs[L]  # base shared across conditions
+        out[("random", "base", L)] = base_vecs[L]
         out[("native", "derived", L)] = der_native[L]
         out[("morphemic", "derived", L)] = der_morph[L]
+        out[("random", "derived", L)] = der_rand[L]
     return out
 
 
@@ -80,7 +94,7 @@ def main() -> None:
     for r in df.itertuples():
         pair = extract_pair(tok, model, r.carrier, r.base, r.derived,
                             r.gold_segmentation, layers)
-        for cond in ("native", "morphemic"):
+        for cond in ("native", "morphemic", "random"):
             for role in ("base", "derived"):
                 for L in layers:
                     per_layer[L].append(pair[(cond, role, L)])

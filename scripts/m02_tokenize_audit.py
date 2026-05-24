@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from transformers import AutoTokenizer
 
@@ -62,6 +63,30 @@ def audit_tokenizer(model_id: str, tok, df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def fertility_gap_ci(audit: pd.DataFrame, n: int = 1000, seed: int = 0) -> pd.DataFrame:
+    """Per tokenizer, the Catalan−English mean-fertility gap with a two-sample
+    bootstrap 95% CI (Catalan and English are different words, so unpaired)."""
+    rng = np.random.default_rng(seed)
+    rows = []
+    for model_id, g in audit.groupby("model"):
+        ca = g[g.lang == "ca"]["fertility"].to_numpy(dtype=float)
+        en = g[g.lang == "en"]["fertility"].to_numpy(dtype=float)
+        if len(ca) == 0 or len(en) == 0:
+            continue
+        diffs = np.array([
+            ca[rng.integers(0, len(ca), len(ca))].mean()
+            - en[rng.integers(0, len(en), len(en))].mean()
+            for _ in range(n)
+        ])
+        rows.append({
+            "model": model_id, "ca_fertility": float(ca.mean()),
+            "en_fertility": float(en.mean()), "gap": float(ca.mean() - en.mean()),
+            "ci_lo": float(np.quantile(diffs, 0.025)),
+            "ci_hi": float(np.quantile(diffs, 0.975)),
+        })
+    return pd.DataFrame(rows).sort_values("gap", ascending=False)
+
+
 def main() -> None:
     df = pd.read_csv(ROOT / "data" / "morph_pairs.csv")
     parts = []
@@ -78,6 +103,11 @@ def main() -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(out_path, index=False)
     print(f"wrote {out_path}  ({len(out)} rows)")
+
+    gap = fertility_gap_ci(out)
+    gap_path = ROOT / "out" / "fertility_gap_ci.csv"
+    gap.to_csv(gap_path, index=False)
+    print(f"wrote {gap_path}  ({len(gap)} rows)")
 
 
 if __name__ == "__main__":

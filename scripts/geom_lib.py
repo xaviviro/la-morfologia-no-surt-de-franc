@@ -116,3 +116,89 @@ def bootstrap_delta_ci(stat_fn, base, derived_native, derived_morph,
         idx = rng.integers(0, m, size=m)
         deltas[k] = stat_fn(base[idx], dm[idx]) - stat_fn(base[idx], dn[idx])
     return float(np.quantile(deltas, alpha / 2)), float(np.quantile(deltas, 1 - alpha / 2))
+
+
+def _two_sided_p(samples: np.ndarray) -> float:
+    """Bootstrap two-sided p that the resampled statistic differs from 0."""
+    n = len(samples)
+    p = 2.0 * min(float(np.mean(samples <= 0.0)), float(np.mean(samples >= 0.0)))
+    return float(min(1.0, max(p, 1.0 / n)))  # floor at 1/n, cap at 1
+
+
+def bootstrap_delta_ci_p(stat_fn, base, derived_a, derived_b,
+                         n: int = 1000, seed: int = 0, alpha: float = 0.05):
+    """Like bootstrap_delta_ci but also returns a two-sided bootstrap p-value for
+    delta = stat_fn(base, derived_a) − stat_fn(base, derived_b).
+    Returns (lo, hi, p); (nan, nan, nan) if < 2 pairs."""
+    base = np.asarray(base, dtype=np.float64)
+    da = np.asarray(derived_a, dtype=np.float64)
+    db = np.asarray(derived_b, dtype=np.float64)
+    m = len(base)
+    if m < 2:
+        return (float("nan"), float("nan"), float("nan"))
+    rng = np.random.default_rng(seed)
+    deltas = np.empty(n)
+    for k in range(n):
+        idx = rng.integers(0, m, size=m)
+        deltas[k] = stat_fn(base[idx], da[idx]) - stat_fn(base[idx], db[idx])
+    lo = float(np.quantile(deltas, alpha / 2))
+    hi = float(np.quantile(deltas, 1 - alpha / 2))
+    return lo, hi, _two_sided_p(deltas)
+
+
+def paired_bootstrap_ci_p(a, b, n: int = 1000, seed: int = 0, alpha: float = 0.05):
+    """Paired bootstrap CI + two-sided p-value for mean(a − b)."""
+    a = np.asarray(a, dtype=np.float64)
+    b = np.asarray(b, dtype=np.float64)
+    assert a.shape == b.shape, "paired inputs must align"
+    diff = a - b
+    m = len(diff)
+    if m < 2:
+        return (float("nan"), float("nan"), float("nan"))
+    rng = np.random.default_rng(seed)
+    means = np.empty(n)
+    for k in range(n):
+        means[k] = diff[rng.integers(0, m, size=m)].mean()
+    lo = float(np.quantile(means, alpha / 2))
+    hi = float(np.quantile(means, 1 - alpha / 2))
+    return lo, hi, _two_sided_p(means)
+
+
+def bootstrap_mean_ci(values, n: int = 1000, seed: int = 0, alpha: float = 0.05):
+    """Bootstrap CI for the mean of `values` (e.g. per-family deltas aggregated
+    into a per-model number). Returns (mean, lo, hi); NaNs are dropped."""
+    values = np.asarray(values, dtype=np.float64)
+    values = values[~np.isnan(values)]
+    m = len(values)
+    if m == 0:
+        return (float("nan"), float("nan"), float("nan"))
+    if m == 1:
+        return (float(values[0]), float("nan"), float("nan"))
+    rng = np.random.default_rng(seed)
+    means = np.empty(n)
+    for k in range(n):
+        means[k] = values[rng.integers(0, m, size=m)].mean()
+    return (float(values.mean()),
+            float(np.quantile(means, alpha / 2)),
+            float(np.quantile(means, 1 - alpha / 2)))
+
+
+def benjamini_hochberg(pvalues) -> np.ndarray:
+    """Benjamini–Hochberg FDR-adjusted q-values for a 1D array of p-values.
+    NaNs are preserved (excluded from the correction)."""
+    p = np.asarray(pvalues, dtype=np.float64)
+    out = np.full(p.shape, np.nan)
+    valid = ~np.isnan(p)
+    pv = p[valid]
+    m = len(pv)
+    if m == 0:
+        return out
+    order = np.argsort(pv)
+    ranked = pv[order]
+    q = ranked * m / np.arange(1, m + 1)
+    q = np.minimum.accumulate(q[::-1])[::-1]  # enforce monotonicity
+    q = np.clip(q, 0.0, 1.0)
+    adj = np.empty(m)
+    adj[order] = q
+    out[valid] = adj
+    return out

@@ -95,6 +95,11 @@ d'un 0 enganyós. Això afecta `deepseek-llm-67b-base`, els offsets del qual
 són en bytes (una `à` de dos bytes desincronitza les posicions de caràcter);
 la seva fertilitat continua sent vàlida i es reporta.
 
+**Diferència de fertilitat CA−EN.** Per a cada tokenitzador reportem el *gap*
+de fertilitat mitjana català−anglès amb un **IC 95 % per bootstrap de dues
+mostres** (català i anglès són paraules diferents, no aparellades);
+`out/fertility_gap_ci.csv`, via `m02_tokenize_audit.fertility_gap_ci`.
+
 ---
 
 ## 4. Extracció d'estats ocults (RQ2, RQ3) — el mecanisme contrafactual
@@ -115,17 +120,22 @@ portadora `PREFIX {w} SUFIX`, muntem els `input_ids` així:
 - **Condició nadiua:** `ids_de_la_paraula = tok(" " + w)` — una sola peça.
 - **Condició morfèmica:** `ids_de_la_paraula = tok(" " + m_1) ++ tok(m_2) ++ …`
   — la segmentació oracle.
+- **Condició aleatòria (placebo):** el mateix nombre de peces que la morfèmica,
+  però tallant per una posició interna **aleatòria que evita la frontera de
+  morfema** (llavor determinista per paraula). És el control que distingeix
+  "alinear amb els morfemes" de "trossejar diferent": si la morfèmica només
+  supera la nadiua però no l'aleatòria, el guany no és específic dels morfemes.
 
 La primera peça es tokenitza amb un espai al davant perquè tant la família
 SentencePiece (`▁`) com la BPE de nivell de byte (`Ġ`) rebin el marcador
 d'inici de paraula correcte; els morfemes següents es tokenitzen pelats
 (continuació interna real, **sense artefacte d'espai**). Els ids del
-`PREFIX`/`SUFIX` són **idèntics** entre les dues condicions, de manera que
+`PREFIX`/`SUFIX` són **idèntics** entre les tres condicions, de manera que
 l'única cosa que varia és la segmentació interna de la paraula — aïllant-ne
 l'efecte.
 
 La paraula base (`ràpid`) és monomorfèmica, sempre d'una sola peça, i és el
-punt de referència compartit pels desplaçaments de les dues condicions.
+punt de referència compartit pels desplaçaments de les tres condicions.
 
 Els estats ocults de cada capa demanada es promitgen (*mean-pool*) sobre la
 regió de la paraula i es normalitzen L2. L'extracció fa servir
@@ -165,26 +175,35 @@ Per als vectors de desplaçament d'una família `o_i = v(derivat_i) − v(base_i
   prediu `v(derivat_j) ≈ v(base_j) + mitjana(o_{i≠j})`; el `derivat`
   candidat més proper (cosinus) és `derivat_j`?
 
-Les tres es computen per `(model, capa, família)` per a **nadiu** i
-**morfèmic**, més el `delta = morfèmic − nadiu` protagonista.
+Les tres es computen per `(model, capa, família, condició)` per a **nadiu**,
+**morfèmic** i **aleatori**, més **dos deltes** a la capa més profunda:
 
-**Intervals de confiança del delta.** A la capa més profunda de cada model
-adjuntem un **IC 95 % per bootstrap (1000 rèpliques)** al delta de consistència
-de direcció i de precisió d'analogia (columnes `*_ci_lo` / `*_ci_hi` de
-`out/geometry_metrics.csv`):
+- `delta = morfèmic − nadiu` — ajuda la segmentació morfèmica respecte a la
+  nadiua?
+- `delta_vs_random = morfèmic − aleatori` — el guany és **específic dels
+  morfemes** o l'obté qualsevol re-segmentació? (control placebo)
+
+**Intervals de confiança i p-valors.** A cada delta de la capa més profunda
+adjuntem un **IC 95 % per bootstrap (1000 rèpliques)** i un **p-valor
+bilateral** (columnes `*_ci_lo`/`*_ci_hi`/`*_p` de `out/geometry_metrics.csv`):
 
 - **Consistència de direcció:** es re-mostregen els parells amb reemplaçament i
-  es recalcula l'estadístic de família per a les dues condicions amb els
-  mateixos índexs (aparellat); es prenen els quantils de la diferència
-  (`geom_lib.bootstrap_delta_ci`).
+  es recalcula l'estadístic de família amb els mateixos índexs (aparellat)
+  (`geom_lib.bootstrap_delta_ci_p`).
 - **Precisió d'analogia:** es bootstrapa la **correcció per parell**
-  (`geom_lib.analogy_correct_per_pair` + `paired_bootstrap_ci`) en lloc de
+  (`geom_lib.analogy_correct_per_pair` + `paired_bootstrap_ci_p`) en lloc de
   re-executar el *leave-one-out* sobre índexs re-mostrejats, perquè els índexs
   duplicats trencarien la identitat del veí més proper i esbiaixarien
   l'estadístic.
 
-Les cel·les amb IC que exclou el zero es marquen amb `*` als mapes de calor i
-en verd al forest plot de `-ment`.
+**Comparacions múltiples.** Com que hi ha moltes cel·les `(model, família)`,
+els p-valors es corregeixen amb **Benjamini–Hochberg (FDR)** dins de cada
+(delta, mètrica) sobre les cel·les de la capa més profunda (columnes `*_q`).
+Els mapes de calor marquen amb `*` les cel·les amb **q < 0,05**.
+
+**Deltes agregats.** A `out/geometry_aggregate_ci.csv` reportem el delta mitjà
+per model (sobre les famílies catalanes) i per família (sobre els models) amb
+un **IC per bootstrap** sobre les unitats agregades (`geom_lib.bootstrap_mean_ci`).
 
 ---
 
@@ -200,6 +219,9 @@ tokenització→geometria. El text de tots els gràfics és en català. Vegeu
 ---
 
 ## Referències
+
+Bibliografia completa i treball relacionat a [`references.md`](references.md).
+Les més directes:
 
 - Bolukbasi, Chang, Zou, Saligrama & Kalai (2016). *Man is to computer
   programmer as woman is to homemaker? Debiasing word embeddings.*

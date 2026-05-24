@@ -3,7 +3,7 @@ import math
 import pandas as pd
 from transformers import AutoTokenizer
 
-from scripts.m02_tokenize_audit import audit_word, audit_tokenizer
+from scripts.m02_tokenize_audit import audit_word, audit_tokenizer, fertility_gap_ci
 
 
 def test_audit_word_reports_fertility_and_recall():
@@ -47,3 +47,14 @@ def test_audit_tokenizer_returns_one_row_per_word():
     out = audit_tokenizer("gpt2", tok, df)
     assert len(out) == 2
     assert set(out["model"]) == {"gpt2"}
+
+
+def test_fertility_gap_ci_positive_when_ca_longer():
+    rows = []
+    for w in range(30):
+        rows.append({"model": "m", "lang": "ca", "fertility": 3.0})
+        rows.append({"model": "m", "lang": "en", "fertility": 1.0})
+    gap = fertility_gap_ci(pd.DataFrame(rows), n=300, seed=0)
+    assert len(gap) == 1
+    r = gap.iloc[0]
+    assert r["gap"] == 2.0 and r["ci_lo"] > 0.0 and r["ci_lo"] <= r["ci_hi"]

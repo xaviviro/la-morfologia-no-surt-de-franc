@@ -8,6 +8,7 @@ device_map="auto", no quantization.
 
 from __future__ import annotations
 
+import hashlib
 import re
 
 import numpy as np
@@ -104,6 +105,31 @@ def assemble_ids(
     word_end = word_start + len(piece_ids)
     input_ids = bos + prefix_ids + piece_ids + suffix_ids
     return input_ids, (word_start, word_end)
+
+
+def random_split(word: str, gold_positions: list[int], n_pieces: int,
+                 seed_salt: int = 0) -> list[str]:
+    """Split `word` into `n_pieces` at random interior positions that AVOID the
+    gold morpheme boundaries — the placebo control for the morphemic condition
+    (same number of pieces, arbitrary cut). Deterministic per word (seeded by a
+    stable hash of the word) so the control is reproducible."""
+    n_cuts = n_pieces - 1
+    length = len(word)
+    if n_cuts < 1 or length < 2:
+        return [word]
+    gold = set(gold_positions)
+    interior = [p for p in range(1, length) if p not in gold]
+    if len(interior) < n_cuts:  # too short to avoid gold — allow any interior cut
+        interior = list(range(1, length))
+    seed = int(hashlib.md5(word.encode("utf-8")).hexdigest()[:8], 16) + seed_salt
+    rng = np.random.default_rng(seed)
+    cuts = sorted(int(c) for c in rng.choice(interior, size=n_cuts, replace=False))
+    pieces, prev = [], 0
+    for c in cuts:
+        pieces.append(word[prev:c])
+        prev = c
+    pieces.append(word[prev:])
+    return pieces
 
 
 def load_model_and_tokenizer(model_id: str, dtype=torch.bfloat16):

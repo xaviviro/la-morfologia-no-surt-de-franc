@@ -20,7 +20,11 @@ amb aquesta segmentació. Per tant:
   surti beneficiat. Això no ho podem observar aquí.
 
 És deliberadament un diagnòstic intrínsec i sense entrenament. Reentrenar un
-tokenitzador + model queda fora d'abast.
+tokenitzador + model queda fora d'abast. El **control placebo** (condició
+aleatòria, findings §7) sí que descarta que el guany sigui de "trossejar
+diferent" en lloc d'alinear amb els morfemes, i la significació per cel·la està
+corregida per comparacions múltiples (FDR); però cap d'aquestes coses no
+substitueix un estudi de reentrenament.
 
 ## El "tokenitzador universal" és un oracle, no un sistema desplegable
 

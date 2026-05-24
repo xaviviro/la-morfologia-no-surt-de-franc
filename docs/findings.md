@@ -179,6 +179,44 @@ els morfemes. Els efectes d'analogia són més sorollosos i poques cel·les
 individuals tenen l'IC 95 % que exclou el zero (vegeu els asteriscos als mapes
 de calor).
 
+## 7. Rigor: el guany és específic dels morfemes (control placebo)
+
+El dubte evident sobre §4 és si *qualsevol* re-segmentació canvia la geometria,
+no l'alineació amb els morfemes. El **control placebo** ho descarta: comparem la
+condició morfèmica amb una condició **aleatòria** (mateix nombre de peces, però
+tallant per una posició interna no morfèmica).
+
+`Δ consistència de direcció` (mitjana sobre famílies CA, capa més profunda, IC 95 %):
+
+| model | morfèmic − nadiu | morfèmic − aleatori |
+| --- | --- | --- |
+| `gemma-2-2b` | +0,088 [+0,045, +0,136] | +0,149 [+0,109, +0,194] |
+| `gemma-4-E2B` | +0,029 [−0,011, +0,070] | +0,077 [+0,026, +0,139] |
+| `Qwen2-1.5B` | +0,026 [−0,032, +0,080] | +0,129 [+0,081, +0,176] |
+| `Qwen3.5-4B-Base` | +0,054 [+0,024, +0,089] | +0,150 [+0,100, +0,208] |
+| `salamandra-2b` | +0,181 [+0,127, +0,218] | +0,208 [+0,172, +0,245] |
+
+En els **cinc models** la segmentació morfèmica supera l'aleatòria amb un IC que
+exclou el zero, i sovint per més marge que respecte a la nadiua. És a dir, la
+segmentació **aleatòria empitjora la geometria per sota de la nativa**, mentre
+que l'alineada amb els morfemes la millora: **el guany és específic dels
+morfemes**, no de trossejar diferent. Vegeu `out/figs/placebo_control.png`.
+
+**Comparacions múltiples (Benjamini–Hochberg, cel·les de la capa més profunda):**
+
+| contrast | direcció (q<0,05) | analogia (q<0,05) |
+| --- | --: | --: |
+| morfèmic − nadiu | 28/70 | 7/70 |
+| morfèmic − aleatori | 49/70 | 26/70 |
+
+El contrast placebo és el més robust fins i tot després de corregir per
+comparacions múltiples.
+
+**Fertilitat CA−EN amb IC.** El *gap* de fertilitat català−anglès té un IC 95 %
+que exclou el zero en **els 11 tokenitzadors** (DeepSeek-67B +1,21 [+1,08, +1,33]
+a dalt; els BSC ~+0,57 [+0,46, +0,69] a baix), confirmant §1 amb incertesa
+(`out/fertility_gap_ci.csv`).
+
 ---
 
 ## Titular
