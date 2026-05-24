@@ -1,0 +1,63 @@
+cff-version: 1.2.0
+title: >-
+  La morfologia no surt de franc: com la tokenització en subparaules
+  fractura la morfologia catalana
+message: Si feu servir aquest conjunt de dades o codi, citeu-lo tal com s'indica a sota.
+type: software
+authors:
+  - family-names: Vinaixa Roselló
+    given-names: Xavier
+    email: xavi@sorensen.ai
+    orcid: "https://orcid.org/0009-0005-2769-9215"
+    affiliation: "Sorensen AI (sorensen.ai), Barcelona, Catalonia"
+    website: "https://sorensen.ai"
+repository-code: "https://github.com/xaviviro/la-morfologia-no-surt-de-franc"
+url: "https://github.com/xaviviro/la-morfologia-no-surt-de-franc"
+abstract: >-
+  Estudi de com la tokenització en subparaules fractura la morfologia
+  catalana i si una segmentació conscient dels morfemes ("universal")
+  recupera la geometria composicional dels estats ocults. Inclou una
+  auditoria de fertilitat i d'alineació de fronteres morfèmiques en 11
+  tokenitzadors de pesos oberts (Google Gemma, Alibaba Qwen, Mistral,
+  DeepSeek i la família BSC-LT Salamandra/ALIA com a control català-aware)
+  i una anàlisi de l'espai vectorial en 5 models petits amb un contrafactual
+  de segmentació morfèmica oracle per empalmament de token ids, amb
+  intervals de confiança per bootstrap. El lèxic curat conté 356 parells
+  base→derivat en 14 famílies morfològiques, inclosos trets ortogràfics
+  catalans (ela geminada l·l, ç, dígraf ny). Troballa principal: el català
+  es fragmenta ~1,7× més que l'anglès (i el punt volat fins a ~4×); els
+  tokenitzadors català-aware ho redueixen però no s'alineen millor amb els
+  morfemes; i imposar la segmentació morfèmica recupera geometria
+  composicional, sobretot en la flexió.
+keywords:
+  - tokenization
+  - subword
+  - morphology
+  - catalan
+  - llm-probing
+  - representation-geometry
+  - fertility
+  - ela-geminada
+  - gemma
+  - qwen
+  - salamandra
+  - alia
+license: MIT
+license-url: "https://opensource.org/licenses/MIT"
+version: 0.1.0
+date-released: "2026-05-24"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Vinaixa Roselló
+      given-names: Xavier
+      orcid: "https://orcid.org/0009-0005-2769-9215"
+      email: xavi@sorensen.ai
+      affiliation: "Sorensen AI (sorensen.ai), Barcelona, Catalonia"
+      website: "https://sorensen.ai"
+  title: >-
+    La morfologia no surt de franc: com la tokenització en subparaules
+    fractura la morfologia catalana
+  year: 2026
+  journal: Preprint, github.com/xaviviro/la-morfologia-no-surt-de-franc
+  url: "https://github.com/xaviviro/la-morfologia-no-surt-de-franc"

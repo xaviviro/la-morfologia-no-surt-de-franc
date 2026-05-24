@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+out/**/*.npz
+out/**/metadata.parquet
+out/**/run_meta.json
+out/*.csv
+# keep committed figures and the audit/metrics summaries:
+!out/figs/
+!out/figs/**
