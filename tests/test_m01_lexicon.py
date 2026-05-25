@@ -34,5 +34,6 @@ def test_lexicon_covers_all_families():
         "gem_lla", "cedilla", "ny",
         "pre_des", "pre_re", "pre_in",
         "verb_reg", "verb_alt", "verb_supl", "nom_cio_d1",
+        "es_mente", "es_cion", "es_dor", "es_dim", "es_plural", "es_genero_a",
     }
     assert expected <= fams

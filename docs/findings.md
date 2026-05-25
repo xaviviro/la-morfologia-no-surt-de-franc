@@ -1,7 +1,7 @@
 # Resultats
 
 > Les xifres són la sortida determinista dels scripts executats sobre el lèxic
-> d'aquest repositori (**441 parells (base, derivat)**, 21 famílies). Les xifres de
+> d'aquest repositori (**517 parells (base, derivat)**, 27 famílies, ca/es/en). Les xifres de
 > geometria són a la capa més profunda escombrada de cada model si no
 > s'indica el contrari. Vegeu [`methodology.md`](methodology.md) per a les
 > definicions de les mètriques.
@@ -246,7 +246,11 @@ lectura pràctica és forta: **no cal una segmentació morfològicament perfecta
 un segmentador no supervisat estàndard ja exposa la major part de l'estructura
 composicional. L'escala de segmentació
 (`out/figs/condition_ladder.png`) ho resumeix: nadiu (0,55) → **aleatori cau a
-0,50** → Morfessor (0,63) ≈ oracle (0,64).
+0,50** → Morfessor no supervisat (0,63) ≈ **regles català** (0,63) ≈ oracle
+(0,64). El **segmentador de regles català** (`scripts/rule_seg.py`) —el
+condicionant "desplegable" que un analitzador de regles representaria— encerta
+el **77,9 %** de les fronteres gold (vs 53,8 % de Morfessor) i iguala l'oracle
+en geometria: és la condició realista més forta de l'estudi.
 
 ## 9. Robustesa entre capes
 
@@ -343,6 +347,45 @@ regular.
 
 Artefactes: `out/ie_sturtevant_gradient.csv`, `out/ie_patterns_summary.csv`.
 
+## 12. Robustesa de portadora: el guany no és un artefacte de la menció
+
+Tots els resultats anteriors fan servir una portadora de **menció** (*He llegit
+la paraula {w}…*). Per descartar que la geometria sigui un artefacte d'aquest
+marc, re-extraiem tot sota una segona portadora d'**ús** per categoria
+(p. ex. *Ho fa {w} cada dia* per a adverbis; *Veig {w} pertot arreu* per a
+plurals) i recalculem el delta morfèmic (oracle − nadiu) per `(model, família)`.
+
+| comparació menció vs ús | valor |
+| --- | --- |
+| Δ mitjà (menció) | +0,093 |
+| Δ mitjà (ús) | +0,078 |
+| concordança de signe | **61/70 (87 %)** |
+| correlació de Spearman | **+0,928** |
+| Δ d'ús positiu | 56/70 (test de signes **p < 0,001**) |
+
+El delta sota la portadora d'ús **segueix gairebé idènticament** el de menció
+(Spearman +0,93; els punts cauen sobre la diagonal a
+`out/figs/carrier_robustness.png`). La millora morfèmica **no depèn de la
+portadora**. (Les famílies `dim_et` i `verb_supl` usen una portadora d'ús
+imperfecta per gènere/heterogeneïtat; vegeu [`limitations.md`](limitations.md).)
+
+## 13. Rèplica romànica: el patró català es manté en castellà
+
+Sis famílies castellanes reflecteixen sis de catalanes (`-mente↔-ment`,
+`-ción↔-ció`, `-dor↔-dor`, dim. `-ito↔-et`, plural, gènere). Comparant-les a la
+capa més profunda:
+
+- Consistència de direcció nadiua: **Spearman(CA, ES) = +0,886**.
+- Delta morfèmic (oracle − nadiu): **Spearman(CA, ES) = +0,771**.
+
+Les famílies que tenen geometria neta (o que guanyen amb el tall morfèmic) en
+català la tenen també en castellà, i a la inversa (`out/romance_comparison.csv`).
+El fenomen **no és una idiosincràsia del català**: es replica en una segona
+llengua romànica. Això sosté el marc **indoeuropeu** —dues romàniques (català,
+castellà) més una germànica (anglès, *baseline*)— però **no** una universalitat
+plena: l'IE és tipològicament molt més divers (eslau, indi, grec…) i tres
+llengües en són una mostra petita (vegeu [`limitations.md`](limitations.md)).
+
 ---
 
 ## Titular
@@ -354,7 +397,13 @@ alineació morfèmica —el sufix `-ment` només s'aïlla ~20% de les vegades en
 *qualsevol* tokenitzador— i la morfologia anglesa parteix de manera més composicional
 que la catalana a l'estat ocult. Imposar una segmentació de morfema oracle en
 temps d'inferència recupera la geometria composicional en els cinc models petits,
-sobretot en flexió, cosa que suggereix que una tokenització conscient dels
-morfemes ("universal") exposaria una estructura composicional que aquests models
-ja codifiquen en part. Vegeu [`limitations.md`](limitations.md) per a què
-afirma i què no afirma això.
+cosa que suggereix que una tokenització conscient dels morfemes exposaria una
+estructura composicional que aquests models ja codifiquen en part. El guany és
+**específic dels morfemes** (cau amb talls aleatoris), **no cal un oracle** (un
+segmentador de regles català, recall 0,78, o fins i tot Morfessor no supervisat
+ja l'igualen), **no depèn de la portadora** (es replica sota un marc d'ús,
+Spearman +0,93) i **es manté en castellà** (Spearman CA~ES +0,89) — un patró
+estable a través de tres llengües indoeuropees, sense pretensió d'universalitat
+plena. Vegeu [`limitations.md`](limitations.md) per a què afirma i què no afirma
+això, incloent-hi que el contrafactual mesura recombinació de peces BPE
+alineades amb morfemes, no codificació del morfema com a unitat.

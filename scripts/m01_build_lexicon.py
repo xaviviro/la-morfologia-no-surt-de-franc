@@ -10,8 +10,51 @@ from pathlib import Path
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
+# Primary carrier: a *mention* frame (works for any category).
 CARRIER_CA = "He llegit la paraula {w} en un llibre."
 CARRIER_EN = "I read the word {w} in a book."
+CARRIER_ES = "Leí la palabra {w} en un libro."
+
+# Second carrier: a *use* frame per family, chosen to be grammatical for that
+# family's category while avoiding article gender/number agreement where possible
+# (robustness check for mention-vs-use; see methodology §2 and limitations).
+# Author-reviewed; families with mixed gender (dim_et) or suppletive variety
+# (verb_supl) use the least-bad universal use frame and are flagged for review.
+CARRIER_USE = {
+    # adverbs / verbs (no article agreement needed)
+    "ment": "Ho fa {w} cada dia.",
+    "verb_em": "Nosaltres {w} cada dia.",
+    "verb_reg": "Jo {w} cada dia.",
+    "verb_alt": "Jo {w} molt.",
+    "verb_supl": "Avui {w} content.",
+    # plural nouns (no article: bare plural works)
+    "plural": "Veig {w} pertot arreu.",
+    "gem_lla": "Veig {w} pertot arreu.",
+    "cedilla": "Veig {w} pertot arreu.",
+    "ny": "Veig {w} pertot arreu.",
+    "nom_cio": "Estudio {w} a la universitat.",
+    "nom_cio_d1": "Estudio {w} a la universitat.",
+    # singular nouns with stable gender
+    "gender_a": "És una {w}.",          # gender_a entries are all feminine
+    "agent_dor": "És un bon {w}.",      # agent_dor entries are all masculine
+    "dim_et": "Quin {w}!",  # article-free to avoid gender (author-chosen)
+    # prefixed verbs / adjectives
+    "pre_des": "Vull {w} això.",
+    "pre_re": "Vull {w} això.",
+    "pre_in": "Sembla {w}.",
+    # English baseline
+    "ly": "He does it {w} every day.",
+    "agent_er": "She is a good {w}.",
+    "nom_tion": "We study {w} at school.",
+    "plural_s": "I see {w} everywhere.",
+    # Spanish replication (second Romance language)
+    "es_mente": "Lo hace {w} cada día.",
+    "es_cion": "Estudio {w} en la universidad.",
+    "es_dor": "Es un buen {w}.",
+    "es_dim": "¡Qué {w}!",
+    "es_plural": "Veo {w} por todas partes.",
+    "es_genero_a": "Es una {w}.",
+}
 
 # Suffix string that each family's gold segmentation must end with.
 FAMILY_SUFFIX = {
@@ -24,6 +67,9 @@ FAMILY_SUFFIX = {
     "pre_des": None, "pre_re": None, "pre_in": None,
     "verb_reg": None, "verb_alt": None, "verb_supl": None,
     "nom_cio_d1": "ció",
+    # Spanish replication
+    "es_mente": "mente", "es_cion": "ción", "es_dor": "dor",
+    "es_dim": None, "es_plural": None, "es_genero_a": "a",
 }
 
 
@@ -36,15 +82,23 @@ class Entry:
     gold_segmentation: str
     morph_type: str
     carrier: str
+    carrier_use: str = ""
     note: str = ""
 
 
 def _ca(family, morph_type, rows):
-    return [Entry("ca", family, b, d, g, morph_type, CARRIER_CA) for (b, d, g) in rows]
+    use = CARRIER_USE.get(family, CARRIER_CA)
+    return [Entry("ca", family, b, d, g, morph_type, CARRIER_CA, use) for (b, d, g) in rows]
 
 
 def _en(family, morph_type, rows):
-    return [Entry("en", family, b, d, g, morph_type, CARRIER_EN) for (b, d, g) in rows]
+    use = CARRIER_USE.get(family, CARRIER_EN)
+    return [Entry("en", family, b, d, g, morph_type, CARRIER_EN, use) for (b, d, g) in rows]
+
+
+def _es(family, morph_type, rows):
+    use = CARRIER_USE.get(family, CARRIER_ES)
+    return [Entry("es", family, b, d, g, morph_type, CARRIER_ES, use) for (b, d, g) in rows]
 
 
 # --- Catalan derivational ---------------------------------------------------
@@ -568,9 +622,105 @@ NOM_CIO_D1 = _ca("nom_cio_d1", "derivational", [
     ("digitalitzar", "digitalització", "digitalitza|ció"),
 ])
 
+# --- Spanish replication (second Romance language; IE-internal transversality) -
+ES_MENTE = _es("es_mente", "derivational", [
+    ("rápido", "rápidamente", "rápida|mente"),
+    ("lento", "lentamente", "lenta|mente"),
+    ("claro", "claramente", "clara|mente"),
+    ("directo", "directamente", "directa|mente"),
+    ("perfecto", "perfectamente", "perfecta|mente"),
+    ("exacto", "exactamente", "exacta|mente"),
+    ("absoluto", "absolutamente", "absoluta|mente"),
+    ("profundo", "profundamente", "profunda|mente"),
+    ("fácil", "fácilmente", "fácil|mente"),
+    ("difícil", "difícilmente", "difícil|mente"),
+    ("normal", "normalmente", "normal|mente"),
+    ("general", "generalmente", "general|mente"),
+    ("simple", "simplemente", "simple|mente"),
+    ("posible", "posiblemente", "posible|mente"),
+    ("fuerte", "fuertemente", "fuerte|mente"),
+    ("reciente", "recientemente", "reciente|mente"),
+])
+
+ES_CION = _es("es_cion", "derivational", [
+    ("educar", "educación", "educa|ción"),
+    ("informar", "información", "informa|ción"),
+    ("crear", "creación", "crea|ción"),
+    ("formar", "formación", "forma|ción"),
+    ("comunicar", "comunicación", "comunica|ción"),
+    ("organizar", "organización", "organiza|ción"),
+    ("presentar", "presentación", "presenta|ción"),
+    ("preparar", "preparación", "prepara|ción"),
+    ("situar", "situación", "situa|ción"),
+    ("generar", "generación", "genera|ción"),
+    ("celebrar", "celebración", "celebra|ción"),
+    ("continuar", "continuación", "continua|ción"),
+])
+
+ES_DOR = _es("es_dor", "derivational", [
+    ("trabajar", "trabajador", "trabaja|dor"),
+    ("jugar", "jugador", "juga|dor"),
+    ("pescar", "pescador", "pesca|dor"),
+    ("comprar", "comprador", "compra|dor"),
+    ("nadar", "nadador", "nada|dor"),
+    ("educar", "educador", "educa|dor"),
+    ("programar", "programador", "programa|dor"),
+    ("administrar", "administrador", "administra|dor"),
+    ("gobernar", "gobernador", "goberna|dor"),
+    ("explorar", "explorador", "explora|dor"),
+    ("organizar", "organizador", "organiza|dor"),
+    ("contar", "contador", "conta|dor"),
+])
+
+ES_DIM = _es("es_dim", "derivational", [
+    ("gato", "gatito", "gat|ito"),
+    ("perro", "perrito", "perr|ito"),
+    ("casa", "casita", "cas|ita"),
+    ("libro", "librito", "libr|ito"),
+    ("niño", "niñito", "niñ|ito"),
+    ("mesa", "mesita", "mes|ita"),
+    ("silla", "sillita", "sill|ita"),
+    ("papel", "papelito", "papel|ito"),
+    ("vaso", "vasito", "vas|ito"),
+    ("plato", "platito", "plat|ito"),
+    ("zapato", "zapatito", "zapat|ito"),
+    ("momento", "momentito", "moment|ito"),
+])
+
+ES_PLURAL = _es("es_plural", "inflectional", [
+    ("gato", "gatos", "gato|s"),
+    ("libro", "libros", "libro|s"),
+    ("coche", "coches", "coche|s"),
+    ("mesa", "mesas", "mesa|s"),
+    ("silla", "sillas", "silla|s"),
+    ("casa", "casas", "casa|s"),
+    ("perro", "perros", "perro|s"),
+    ("niño", "niños", "niño|s"),
+    ("color", "colores", "color|es"),
+    ("flor", "flores", "flor|es"),
+    ("papel", "papeles", "papel|es"),
+    ("árbol", "árboles", "árbol|es"),
+])
+
+ES_GENERO_A = _es("es_genero_a", "inflectional", [
+    ("gato", "gata", "gat|a"),
+    ("niño", "niña", "niñ|a"),
+    ("perro", "perra", "perr|a"),
+    ("hijo", "hija", "hij|a"),
+    ("hermano", "hermana", "herman|a"),
+    ("profesor", "profesora", "profesor|a"),
+    ("doctor", "doctora", "doctor|a"),
+    ("señor", "señora", "señor|a"),
+    ("abuelo", "abuela", "abuel|a"),
+    ("maestro", "maestra", "maestr|a"),
+    ("vecino", "vecina", "vecin|a"),
+    ("amigo", "amiga", "amig|a"),
+])
+
 LEXICON: list[Entry] = (
     MENT + DIM_ET + AGENT_DOR + NOM_CIO + PLURAL + VERB_EM + GENDER_A
     + LY + AGENT_ER + NOM_TION + PLURAL_S
+    + ES_MENTE + ES_CION + ES_DOR + ES_DIM + ES_PLURAL + ES_GENERO_A
     + GEM_LLA + CEDILLA + NY
     + PRE_DES + PRE_RE + PRE_IN
     + VERB_REG + VERB_ALT + VERB_SUPL
@@ -588,9 +738,11 @@ def validate_entry(e: Entry) -> list[str]:
         msgs.append(f"family {e.family} expects suffix {suffix!r}, got {e.gold_segmentation!r}")
     if "{w}" not in e.carrier:
         msgs.append("carrier missing {w} slot")
+    if "{w}" not in e.carrier_use:
+        msgs.append("carrier_use missing {w} slot")
     if not e.base or not e.derived:
         msgs.append("empty base/derived")
-    if e.lang not in {"ca", "en"}:
+    if e.lang not in {"ca", "en", "es"}:
         msgs.append(f"bad lang {e.lang!r}")
     if e.morph_type not in {"derivational", "inflectional"}:
         msgs.append(f"bad morph_type {e.morph_type!r}")

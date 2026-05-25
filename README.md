@@ -1,7 +1,8 @@
 # La morfologia no surt de franc
 
 **Com la tokenització en subparaules fractura la morfologia catalana, i si
-una segmentació universal recupera la geometria de l'espai latent.**
+una segmentació conscient dels morfemes recupera la geometria de l'espai
+latent — provat en tres llengües indoeuropees (català, castellà, anglès).**
 
 Estudi germà de [*Coca Is Not Cocaine*](https://github.com/xaviviro/coca-is-not-cocaine), que reutilitza el mateix panell de
 models de pesos oberts però fa una pregunta de tokenització i morfologia:
@@ -16,7 +17,7 @@ protagonista.
 
 Hem mesurat com els tokenitzadors dels grans models de llenguatge tallen la
 morfologia catalana, i hem provat si imposar les fronteres morfèmiques
-correctes recupera estructura composicional. Set resultats:
+correctes recupera estructura composicional. Vuit resultats:
 
 1. **El català es fragmenta molt més que l'anglès.** Als models
    anglo-dominants (Gemma, Qwen, Mistral) una paraula catalana costa **~1,7×**
@@ -34,7 +35,7 @@ correctes recupera estructura composicional. Set resultats:
    forcem el tall pels morfemes en temps d'inferència (sense reentrenar), la
    **geometria millora en els cinc models petits** —sobretot en flexió (gènere,
    plural) i en l'analogia de `-ment`. Això suggereix que una tokenització
-   "universal" conscient dels morfemes exposaria una estructura que els models ja
+   conscient dels morfemes exposaria una estructura que els models ja
    codifiquen en part.
 
 4. **El punt volat (`l·l`) és el tret ortogràfic més castigat.** Una paraula
@@ -62,6 +63,12 @@ correctes recupera estructura composicional. Set resultats:
    tendència feble sense gradient net; i la **profunditat derivativa** és una
    evidència en contra (falsador) —l'afix `-ció` sobre base derivada és *més* regular, no
    menys.
+
+8. **El guany és robust.** No depèn de la frase portadora (es replica gairebé
+   idèntic sota un marc d'**ús**, Spearman menció~ús = **+0,93**) i **es manté en
+   castellà** (rèplica de 6 famílies paral·leles, Spearman CA~ES = **+0,89**): un
+   patró estable a través de tres llengües indoeuropees, sense pretensió
+   d'universalitat plena.
 
 > Els models del BSC (Salamandra / ALIA) s'inclouen com a control
 > conscient del català i es descriuen de manera neutra al llarg de tot l'estudi.
@@ -134,8 +141,21 @@ L'oracle és el sostre teòric. Un **Morfessor** no supervisat (que mai veu les
 fronteres gold i només n'encerta el ~54 %) **gairebé iguala l'oracle** en
 geometria, i el seu guany exclou el zero en els 5 models. La lectura pràctica:
 no cal una segmentació perfecta — una de raonable ja exposa la composicionalitat.
-L'escala és nítida: nadiu (0,52) → aleatori cau (0,45) → Morfessor (0,59) ≈
-oracle (0,60).
+L'escala és nítida: nadiu (0,55) → aleatori cau (0,50) → Morfessor (0,63) ≈
+**regles català (0,63)** ≈ oracle (0,64). El segmentador de **regles català**
+(recall 0,78 vs gold, molt per sobre del 0,54 de Morfessor) és el condicionant
+desplegable més fort i iguala l'oracle.
+
+### Robustesa de portadora i rèplica romànica
+
+![Robustesa de portadora: menció vs ús](out/figs/carrier_robustness.png)
+
+El guany morfèmic **no depèn de la frase portadora**: re-extret sota una
+portadora d'**ús** (en lloc de menció), el delta segueix gairebé idèntic
+(Spearman +0,93; els punts cauen sobre la diagonal). I **es replica en castellà**
+(6 famílies paral·leles, Spearman CA~ES = +0,89 en consistència nadiua, +0,77 en
+el delta morfèmic) — el patró no és una idiosincràsia del català, sinó estable a
+través de tres llengües indoeuropees.
 
 ### Robustesa entre capes
 
@@ -192,8 +212,8 @@ Salamandra-2B (0,625 → 0,950).
 
 ## El lèxic
 
-Lèxic curat a mà (`data/morph_pairs.csv`, **441 parells** base→derivat, **21
-famílies**, llicència CC-BY), revisat per l'autor (accents, la regla del femení
+Lèxic curat a mà (`data/morph_pairs.csv`, **517 parells** base→derivat, **27
+famílies** en tres llengües IE (ca/es/en), llicència CC-BY), revisat per l'autor (accents, la regla del femení
 per a `-ment`, formes irregulars):
 
 | grup | famílies | morfologia |
@@ -204,6 +224,7 @@ per a `-ment`, formes irregulars):
 | prefixació CA | `pre_des`, `pre_re`, `pre_in` | prefixos des-, re-, in-/im- |
 | gradient verbal CA | `verb_reg`, `verb_alt`, `verb_supl` | regular → alternança d'arrel → suppletiu (1a sg present) |
 | profunditat CA | `nom_cio_d1` | -ció sobre base ja derivada (globalitzar→globalització) |
+| rèplica ES | `es_mente`, `es_cion`, `es_dor`, `es_dim`, `es_plural`, `es_genero_a` | 6 famílies castellanes paral·leles (segona llengua romànica) |
 | *baseline* EN | `ly`, `agent_er`, `nom_tion`, `plural_s` | adverbi -ly, agentiu -er, -tion, plural -s |
 
 La taula completa amb el detall de cada família és a

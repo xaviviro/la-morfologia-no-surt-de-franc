@@ -24,6 +24,7 @@ from scripts.embed_lib import (
 )
 from scripts.morf_seg import segment as morf_segment
 from scripts.morf_seg import train_morfessor
+from scripts.rule_seg import segment as rule_segment
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -68,13 +69,20 @@ def extract_pair(tok, model, carrier, base, derived, gold_segmentation, layers,
         ids_df, span_df = assemble_ids(tok, prefix, morf_pieces, suffix)
         der_morf = embed_span(model, ids_df, span_df, layers)
 
+    # realistic rule-based Catalan segmenter (deployable, stronger than Morfessor)
+    rule_pieces = rule_segment(derived) or [derived]
+    ids_dru, span_dru = assemble_ids(tok, prefix, rule_pieces, suffix)
+    der_rule = embed_span(model, ids_dru, span_dru, layers)
+
     for L in layers:
         out[("native", "base", L)] = base_vecs[L]
         out[("morphemic", "base", L)] = base_vecs[L]  # base shared across conditions
         out[("random", "base", L)] = base_vecs[L]
+        out[("rules", "base", L)] = base_vecs[L]
         out[("native", "derived", L)] = der_native[L]
         out[("morphemic", "derived", L)] = der_morph[L]
         out[("random", "derived", L)] = der_rand[L]
+        out[("rules", "derived", L)] = der_rule[L]
         if der_morf is not None:
             out[("morfessor", "base", L)] = base_vecs[L]
             out[("morfessor", "derived", L)] = der_morf[L]
@@ -106,17 +114,22 @@ def main() -> None:
 
     per_layer: dict[int, list[np.ndarray]] = {L: [] for L in layers}
     meta_rows: list[dict] = []
+    # two carrier frames: mention (primary) and use (robustness)
+    carriers = [("mention", "carrier"), ("use", "carrier_use")]
     for r in df.itertuples():
-        pair = extract_pair(tok, model, r.carrier, r.base, r.derived,
-                            r.gold_segmentation, layers, morf_model=morf_model)
-        for cond in ("native", "morphemic", "random", "morfessor"):
-            for role in ("base", "derived"):
-                for L in layers:
-                    per_layer[L].append(pair[(cond, role, L)])
-                meta_rows.append({
-                    "lang": r.lang, "family": r.family, "morph_type": r.morph_type,
-                    "base": r.base, "derived": r.derived, "condition": cond, "role": role,
-                })
+        for carrier_kind, carrier_col in carriers:
+            carrier = getattr(r, carrier_col)
+            pair = extract_pair(tok, model, carrier, r.base, r.derived,
+                                r.gold_segmentation, layers, morf_model=morf_model)
+            for cond in ("native", "morphemic", "random", "morfessor", "rules"):
+                for role in ("base", "derived"):
+                    for L in layers:
+                        per_layer[L].append(pair[(cond, role, L)])
+                    meta_rows.append({
+                        "lang": r.lang, "family": r.family, "morph_type": r.morph_type,
+                        "base": r.base, "derived": r.derived,
+                        "condition": cond, "role": role, "carrier_kind": carrier_kind,
+                    })
 
     meta = pd.DataFrame(meta_rows)
     meta.to_parquet(out_dir / "metadata.parquet", index=False)

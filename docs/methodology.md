@@ -2,7 +2,7 @@
 
 > Com mesurem la fragmentació de la morfologia catalana pels tokenitzadors i
 > la seva conseqüència sobre la geometria de l'espai latent, i com provem si
-> una segmentació conscient dels morfemes ("universal") recupera aquesta
+> una segmentació conscient dels morfemes recupera aquesta
 > geometria sense reentrenar. El resum d'alt nivell és al
 > [`../README.md`](../README.md); les ordres de reproducció són a
 > [`reproduce.md`](reproduce.md).
@@ -31,7 +31,7 @@ morfologia en lloc d'una de col·lisió cultural.
   l'operació és composicional.
 
 - **RQ3 — Mitigació / contrafactual (nivell de model, GPU).** Si imposem una
-  segmentació conscient dels morfemes ("universal") en temps d'inferència,
+  segmentació conscient dels morfemes en temps d'inferència,
   mantenint els pesos del model fixos, el subespai es torna més lineal / puja
   la precisió d'analogia? És a dir, *ajudaria una tokenització diferent, fins
   i tot sense reentrenar?*
@@ -40,11 +40,12 @@ morfologia en lloc d'una de col·lisió cultural.
 
 ## 2. El lèxic
 
-Un lèxic curat a mà (`data/morph_pairs.csv`, 441 parells (base, derivat) en 21
-famílies, llicència CC-BY) amb **fronteres de morfema oracle**, revisat per l'autor pel
-que fa a la correcció catalana (accents, la regla del femení per a `-ment`,
-formes irregulars). Cada fila: `lang, family, base, derived,
-gold_segmentation` (morfemes separats per barra), `morph_type, carrier`.
+Un lèxic curat a mà (`data/morph_pairs.csv`, 517 parells (base, derivat) en 27
+famílies i **tres llengües indoeuropees** (català, castellà, anglès), llicència
+CC-BY) amb **fronteres de morfema oracle**, revisat per l'autor pel que fa a la
+correcció (accents, la regla del femení per a `-ment`/`-mente`, formes
+irregulars). Cada fila: `lang, family, base, derived, gold_segmentation`
+(morfemes separats per barra), `morph_type, carrier, carrier_use`.
 
 | llengua | família | n | morfologia |
 | --- | --- | -: | --- |
@@ -65,6 +66,8 @@ gold_segmentation` (morfemes separats per barra), `morph_type, carrier`.
 | en | `agent_er` | 25 | agentiu `-er` |
 | en | `nom_tion` | 25 | nominalitzador `-tion`/`-ation` |
 | en | `plural_s` | 30 | plural `-s` |
+| es | `es_mente` / `es_cion` / `es_dor` | 16/12/12 | rèplica romànica: adverbi `-mente` (sobre femení), `-ción`, agentiu `-dor` |
+| es | `es_dim` / `es_plural` / `es_genero_a` | 12/12/12 | diminutiu `-ito/-ita`, plural `-s/-es`, gènere `-a` |
 
 `-ment` és el protagonista. Les famílies angleses són una **referència (*baseline*)** paral·lela:
 permeten preguntar si un tokenitzador anglo-dominant representa la morfologia
@@ -77,11 +80,14 @@ el substantiu *soc* (esclop / mercat). Com que l'accent **canvia la seqüència 
 tokens**, la decisió es documenta explícitament aquí i al codi
 (`scripts/m01_build_lexicon.py`).
 
-Una única **frase portadora** metalingüística posa cada paraula en una
-posició sintàctica uniforme independentment de la categoria gramatical —
-català: *He llegit la paraula {w} en un llibre.*; anglès: *I read the word
-{w} in a book.* Això elimina els confusors sintàctics lligats a la categoria
-de l'embedding contextual.
+**Dues frases portadores.** La portadora primària és de **menció**
+metalingüística (català: *He llegit la paraula {w} en un llibre.*; castellà:
+*Leí la palabra {w} en un libro.*; anglès: *I read the word {w} in a book.*),
+que posa cada paraula en una posició uniforme independentment de la categoria.
+Com a comprovació de robustesa (findings §12) afegim una segona portadora d'**ús**
+per família (columna `carrier_use`), gramatical per a la categoria de la
+família (p. ex. *Ho fa {w} cada dia* per a adverbis; *Veig {w} pertot arreu* per
+a plurals). Cada paraula s'extreu sota totes dues portadores.
 
 ---
 
@@ -142,6 +148,12 @@ portadora `PREFIX {w} SUFIX`, muntem els `input_ids` així:
   pràctic, no només el sostre teòric. El pes de corpus 1,0 s'ha triat perquè
   pesos més baixos sobre-segmenten a caràcters i més alts deixen les paraules
   senceres.
+- **Condició de regles (segmentador desplegable):** un segmentador de **regles
+  català** (`scripts/rule_seg.py`) que talla per una llista d'afixos productius
+  coneguts (`-ment`, `-ció`, `-dor`, `-et`, plurals, `des-`, `re-`, `in-`…). A
+  diferència d'un lematitzador (FreeLing/Stanza, que dona lema+POS, no fronteres
+  de superfície), dona la segmentació de superfície que la mètrica necessita. És
+  el condicionant realista més fort: recall 0,78 vs gold (vs 0,54 de Morfessor).
 
 La primera peça es tokenitza amb un espai al davant perquè tant la família
 SentencePiece (`▁`) com la BPE de nivell de byte (`Ġ`) rebin el marcador
@@ -159,8 +171,10 @@ regió de la paraula i es normalitzen L2. L'extracció fa servir
 `dtype=bfloat16`, `device_map="auto"`, sense quantització —emmirallant el
 `02_extract_embeddings.py` de l'estudi coca.
 
-**El "tokenitzador universal" de referència és la segmentació de morfema oracle
-(gold)** — el límit superior morfològicament perfecte.
+**La segmentació de referència és la de morfema oracle (gold)** — el límit
+superior morfològicament perfecte; "conscient dels morfemes" en el sentit d'un
+esquema de segmentació general, no de transversalitat lingüística (l'abast
+provat és de tres llengües indoeuropees: català, castellà, anglès).
 
 ### Què mesura (i què NO mesura) aquest contrafactual
 

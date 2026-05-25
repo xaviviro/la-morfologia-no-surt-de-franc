@@ -61,10 +61,10 @@ el rendiment?" queda oberta. El pont seria una tasca de *probing* morfològic
 la connexió fertilitat→rendiment de Goldman et al. (2024). És l'addició
 d'impacte més gran pendent.
 
-## El "tokenitzador universal" és un oracle, no un sistema desplegable
+## La segmentació oracle no és un sistema desplegable
 
 La segmentació de morfema és la frontera oracle curada per construcció al
-lèxic — un límit superior morfològicament perfecte. Un segmentador universal
+lèxic — un límit superior morfològicament perfecte. Un segmentador real
 real (p. ex. Morfessor, un analitzador morfològic del català) seria més
 sorollós. El nostre resultat és doncs "la segmentació alineada amb els
 morfemes ajuda al sostre", cosa que acota, però no iguala, el que donaria una
@@ -97,7 +97,7 @@ es pot computar de manera fiable i es reporta com a `NaN`. La seva fertilitat
 - **L'elecció de capa** reutilitza els escombrats per model de l'estudi coca;
   s'usa la capa més profunda escombrada per a les xifres titulars. Els
   resultats a les tres capes escombrades són a `out/geometry_metrics.csv`.
-- **La mida del lèxic** és de 441 parells (8–40 per família); les estimacions
+- **La mida del lèxic** és de 517 parells (8–40 per família); les estimacions
   per família són més estables que la primera passada de ~150 parells però
   encara modestes. Per això els deltes per cel·la `(model, família)` ara porten
   un **IC 95 % per bootstrap** (a la capa més profunda; vegeu
@@ -136,6 +136,26 @@ s'ha de llegir com "no hi ha evidència de diferència", no com "són idèntique
   ajuda".
 - **Prefixos**: `in-/im-` barreja al·lomorfs (`in|útil` vs `im|possible`); la
   frontera gold segueix la forma de superfície.
+
+## "Indoeuropeu" ≠ universal; dues romàniques són properes
+
+L'estudi prova **tres llengües indoeuropees**: català i castellà (romàniques) i
+anglès (germànica, *baseline*). La rèplica catalana↔castellana (findings §13) és
+forta, però català i castellà són **tipològicament molt properes** (totes dues
+romàniques, fusionals, sufixals, amb morfemes gairebé un a un). Per tant el marc
+correcte és "estable a través d'aquestes tres llengües IE", **no** una
+universalitat morfològica: l'IE inclou tipus més diversos (eslau, indi, grec…)
+i, encara més, llengües no-IE aglutinants (basc, turc) o no-concatenatives
+(àrab) —on el mètode d'*offset* fins i tot podria trencar-se— queden fora. El
+terme "universal" del títol s'ha suavitzat a "conscient dels morfemes" per això.
+
+## Portadora d'ús imperfecta en dues famílies
+
+La portadora d'ús (findings §12) és gramatical per a la majoria de famílies,
+però `dim_et` (diminutius de gènere mixt, *el gatet* / *la caseta*) fa servir
+una plantilla sense article (*Quin {w}!*) i `verb_supl` (suppletius heterogenis:
+*sóc, vaig, faig, he*…) fa servir *Avui {w} content*, que no encaixa per a
+*vaig*/*he*. Aquests dos casos s'han d'interpretar amb cautela.
 
 ## Encuadre dels models del BSC
 

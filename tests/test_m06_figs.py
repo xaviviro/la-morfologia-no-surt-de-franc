@@ -1,6 +1,7 @@
 import pandas as pd
 
 from scripts.m06_figs import (
+    fig_carrier_robustness,
     fig_condition_ladder,
     fig_delta_heatmap,
     fig_fertility_ratio,
@@ -12,6 +13,17 @@ from scripts.m06_figs import (
     fig_sturtevant,
     fig_tokenization_examples,
 )
+
+
+def test_fig_carrier_robustness_writes_png(tmp_path):
+    cr = pd.DataFrame({
+        "model": ["m"] * 5, "family": list("abcde"),
+        "delta_mention": [0.10, 0.05, -0.02, 0.08, 0.12],
+        "delta_use": [0.09, 0.06, 0.01, 0.07, 0.10],
+    })
+    p = tmp_path / "cr.png"
+    fig_carrier_robustness(cr, p)
+    assert p.exists() and p.stat().st_size > 0
 
 
 def test_fig_sturtevant_writes_png(tmp_path):

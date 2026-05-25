@@ -349,7 +349,8 @@ def fig_condition_ladder(metrics: pd.DataFrame, metric: str, path: Path) -> None
 
     deep = {m: ls[-1] for m, ls in GEOMETRY_MODELS.items()}
     order = [("native", "nadiu"), ("random", "aleatori"),
-             ("morfessor", "Morfessor (realista)"), ("morphemic", "morfèmic (oracle)")]
+             ("morfessor", "Morfessor (no superv.)"), ("rules", "regles (català)"),
+             ("morphemic", "morfèmic (oracle)")]
     means, los, his, labels = [], [], [], []
     for cond, label in order:
         vals = []
@@ -365,7 +366,7 @@ def fig_condition_ladder(metrics: pd.DataFrame, metric: str, path: Path) -> None
         his.append(hi)
         labels.append(label)
     x = np.arange(len(labels))
-    colors = ["#bdbdbd", "#d95f02", "#7570b3", "#1b9e77"][: len(labels)]
+    colors = ["#bdbdbd", "#d95f02", "#7570b3", "#66a61e", "#1b9e77"][: len(labels)]
     fig, ax = plt.subplots(figsize=(9, 5.5))
     err = np.vstack([np.array(means) - np.array(los), np.array(his) - np.array(means)])
     ax.bar(x, means, yerr=err, capsize=5, color=colors)
@@ -432,6 +433,29 @@ def fig_regularity(analysis: pd.DataFrame, path: Path) -> None:
     plt.close()
 
 
+def fig_carrier_robustness(cr: pd.DataFrame, path: Path) -> None:
+    """Scatter del delta morfèmic (oracle−nadiu, direcció) sota la portadora de
+    menció vs la d'ús, per (model, família). Si els punts cauen prop de la
+    diagonal i al quadrant positiu, el guany no és un artefacte de la portadora."""
+    d = cr.dropna(subset=["delta_mention", "delta_use"])
+    fig, ax = plt.subplots(figsize=(6.5, 6.5))
+    ax.axhline(0, color="gray", lw=0.8)
+    ax.axvline(0, color="gray", lw=0.8)
+    lim = float(np.nanmax(np.abs([d.delta_mention.values, d.delta_use.values]))) + 0.02
+    ax.plot([-lim, lim], [-lim, lim], ls="--", color="black", lw=1, label="diagonal x=y")
+    ax.scatter(d.delta_mention, d.delta_use, s=28, alpha=0.7, color="#1b9e77")
+    ax.set_xlim(-lim, lim)
+    ax.set_ylim(-lim, lim)
+    ax.set_xlabel("Δ amb portadora de menció")
+    ax.set_ylabel("Δ amb portadora d'ús")
+    ax.set_title("Robustesa de portadora: Δ morfèmic (oracle−nadiu)\nmenció vs ús, per model×família")
+    ax.legend(loc="upper left")
+    plt.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+
 def fig_sturtevant(grad: pd.DataFrame, path: Path) -> None:
     """Gradient de Sturtevant: consistència de direcció nadiua decau
     regular → alternança d'arrel → supletiu (amb IC 95%)."""
@@ -487,6 +511,10 @@ def main() -> None:
     grad_path = ROOT / "out" / "ie_sturtevant_gradient.csv"
     if grad_path.exists():
         fig_sturtevant(pd.read_csv(grad_path), FIGS / "sturtevant_gradient.png")
+
+    cr_path = ROOT / "out" / "carrier_robustness.csv"
+    if cr_path.exists():
+        fig_carrier_robustness(pd.read_csv(cr_path), FIGS / "carrier_robustness.png")
 
     examples = [
         ("ràpidament", "ràpida|ment"),

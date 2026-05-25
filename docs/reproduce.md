@@ -21,14 +21,14 @@ tokenitzador que no pugui carregar i ho reporta.
 
 ```bash
 uv run python scripts/m01_build_lexicon.py
-# -> data/morph_pairs.csv  (441 files, 21 famílies)
+# -> data/morph_pairs.csv  (517 files, 27 famílies — ca/es/en)
 ```
 
 ## 2. Auditoria del tokenitzador (RQ1) — els 11 tokenitzadors, sense GPU
 
 ```bash
 uv run python scripts/m02_tokenize_audit.py
-# -> out/tokenize_audit.csv  (11 models x 441 paraules)
+# -> out/tokenize_audit.csv  (11 models x 517 paraules)
 ```
 
 ## 3. Extreure embeddings nadius + morfèmics (RQ2/RQ3) — 5 models petits
@@ -52,7 +52,7 @@ la taula de concordança Morfessor↔gold pots executar
 
 ```bash
 uv run python scripts/m04_geometry.py
-# -> out/geometry_metrics.csv (5 models x 3 capes x 21 famílies x
+# -> out/geometry_metrics.csv (5 models x 3 capes x 27 famílies x
 #    {nadiu,morfèmic,aleatori,morfessor} + deltes) i out/geometry_aggregate_ci.csv
 ```
 
@@ -61,6 +61,8 @@ uv run python scripts/m04_geometry.py
 ```bash
 uv run python scripts/m07_regularity.py   # regularitat: flexió vs derivació
 uv run python scripts/m08_ie_patterns.py  # prefixació, Sturtevant, profunditat
+uv run python scripts/m09_carrier_robustness.py  # robustesa de portadora (menció vs ús)
+uv run python scripts/m10_romance.py      # rèplica romànica (CA vs ES)
 uv run python scripts/m05_figs.py
 uv run python scripts/m06_figs.py   # figures explicatives extra
 # -> out/figs/*.png
@@ -79,6 +81,9 @@ uv run python scripts/m06_figs.py   # figures explicatives extra
 | `morf_seg.py` | lèxic | `out/morfessor_agreement.csv` | no |
 | `m07_regularity.py` | mètriques + `data/family_traits.csv` | `out/regularity_*.csv` | no |
 | `m08_ie_patterns.py` | mètriques | `out/ie_*.csv` | no |
+| `m09_carrier_robustness.py` | npz + metadata | `out/carrier_robustness.csv` | no |
+| `m10_romance.py` | mètriques | `out/romance_comparison.csv` | no |
+| `rule_seg.py` | lèxic | `out/rule_seg_agreement.csv` | no |
 
 La lògica pura viu a `scripts/geom_lib.py` (mètriques de geometria) i
 `scripts/embed_lib.py` (ajudes de tokenització + extracció), totes dues

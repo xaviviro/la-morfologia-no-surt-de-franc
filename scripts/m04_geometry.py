@@ -50,7 +50,8 @@ VERB_GRADIENT = ["verb_reg", "verb_alt", "verb_supl"]
 DELTAS = {
     "delta": ("morphemic", "native"),            # oracle vs native
     "delta_vs_random": ("morphemic", "random"),  # placebo: morpheme-specific?
-    "delta_morfessor": ("morfessor", "native"),  # realistic segmenter vs native
+    "delta_morfessor": ("morfessor", "native"),  # realistic unsup. segmenter vs native
+    "delta_rules": ("rules", "native"),          # rule-based segmenter vs native
 }
 METRICS = ["direction_consistency", "analogy_acc"]
 N_BOOT = 1000
@@ -70,8 +71,11 @@ def _dir_stat(base: np.ndarray, derived: np.ndarray) -> float:
     return direction_consistency(derived - base)
 
 
-def _matrices(meta: pd.DataFrame, vecs: np.ndarray, family: str, condition: str):
+def _matrices(meta: pd.DataFrame, vecs: np.ndarray, family: str, condition: str,
+              carrier_kind: str = "mention"):
     sel = meta[(meta.family == family) & (meta.condition == condition)]
+    if "carrier_kind" in meta.columns:
+        sel = sel[sel.carrier_kind == carrier_kind]
     base = vecs[sel[sel.role == "base"].index.to_numpy()]
     derived = vecs[sel[sel.role == "derived"].index.to_numpy()]
     return base, derived
@@ -86,7 +90,8 @@ def main() -> None:
             continue
         meta = pd.read_parquet(mdir / "metadata.parquet")
         present = set(meta.condition)
-        conditions = [c for c in ("native", "morphemic", "random", "morfessor") if c in present]
+        conditions = [c for c in ("native", "morphemic", "random", "morfessor", "rules")
+                      if c in present]
         for L in layers:
             vecs = np.load(mdir / f"embeddings_layer{L}.npz")["vectors"]
             for family in sorted(meta.family.unique()):
