@@ -8,8 +8,21 @@ from scripts.m06_figs import (
     fig_ment_delta_forest,
     fig_morfessor_agreement,
     fig_placebo,
+    fig_regularity,
     fig_tokenization_examples,
 )
+
+
+def test_fig_regularity_writes_png(tmp_path):
+    analysis = pd.DataFrame([
+        {"family": "plural", "consistency": 0.50, "morph_type": "inflectional", "condition": "native"},
+        {"family": "ment", "consistency": 0.56, "morph_type": "derivational", "condition": "native"},
+        {"family": "plural", "consistency": 0.60, "morph_type": "inflectional", "condition": "morphemic"},
+        {"family": "ment", "consistency": 0.59, "morph_type": "derivational", "condition": "morphemic"},
+    ])
+    p = tmp_path / "reg.png"
+    fig_regularity(analysis, p)
+    assert p.exists() and p.stat().st_size > 0
 
 
 def _synth_aggregate():

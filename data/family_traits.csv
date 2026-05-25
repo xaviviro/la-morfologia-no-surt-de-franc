@@ -1,0 +1,11 @@
+family,morph_type,transparency_rank,rationale
+plural,inflectional,1,"flexió nominal altament productiva i regular (-s/-os)"
+gender_a,inflectional,1,"flexió de gènere productiva i regular (-a)"
+verb_em,inflectional,1,"flexió verbal regular (1a pl. present -em)"
+gem_lla,inflectional,1,"plural regular; la complicació és ortogràfica (l·l), no morfològica"
+cedilla,inflectional,1,"plural regular; la complicació és ortogràfica (ç), no morfològica"
+ny,inflectional,1,"plural regular; la complicació és ortogràfica (dígraf ny)"
+dim_et,derivational,2,"diminutiu -et/-eta: productiu i força transparent, amb matís afectiu"
+agent_dor,derivational,2,"agentiu -dor: derivació productiva i força transparent (X-dor = qui fa X)"
+ment,derivational,3,"adverbial -ment: gramaticalitzat (< llatí MENTE), contribució composicional difusa"
+nom_cio,derivational,3,"nominalitzador -ció: al·lomorfia i lexicalització semàntica forta (educació)"

@@ -75,6 +75,19 @@ es pot computar de manera fiable i es reporta com a `NaN`. La seva fertilitat
   per família petita i artefactes específics del tokenitzador, no s'han de
   sobreinterpretar cel·les individuals.
 
+## Anàlisi de regularitat (flexió vs derivació)
+
+L'anàlisi de [`findings.md`](findings.md) §10 té dues limitacions. Primer, hi ha
+només **10 famílies catalanes**, així que els tests flexió-vs-derivació tenen
+poca potència (per això tots els IC creuen el zero — un *nul* amb n petita no és
+una prova forta d'absència d'efecte). Segon, les etiquetes de
+`data/family_traits.csv` (morph_type, transparency_rank) es basen en principis
+lingüístics estàndard, però **l'anotador ja coneixia els resultats geomètrics**,
+de manera que el rang de transparència no és estrictament cec; el predictor
+robust és l'etiqueta objectiva flexiu/derivatiu. La convergència a ~0,60 amb
+tall morfèmic és el resultat sòlid; l'absència de diferència flexió/derivació
+s'ha de llegir com "no hi ha evidència de diferència", no com "són idèntiques".
+
 ## Encuadre dels models del BSC
 
 La família Salamandra / ALIA del BSC s'inclou com a control català-aware i es

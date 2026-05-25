@@ -58,6 +58,7 @@ uv run python scripts/m04_geometry.py
 ## 5. Figures
 
 ```bash
+uv run python scripts/m07_regularity.py   # regularitat: flexió vs derivació
 uv run python scripts/m05_figs.py
 uv run python scripts/m06_figs.py   # figures explicatives extra
 # -> out/figs/*.png
@@ -74,6 +75,7 @@ uv run python scripts/m06_figs.py   # figures explicatives extra
 | `m05_figs.py` | auditoria + mètriques + npz | `out/figs/*.png` | no |
 | `m06_figs.py` | auditoria + mètriques + tokenitzadors | `out/figs/*.png` (extra) | no |
 | `morf_seg.py` | lèxic | `out/morfessor_agreement.csv` | no |
+| `m07_regularity.py` | mètriques + `data/family_traits.csv` | `out/regularity_*.csv` | no |
 
 La lògica pura viu a `scripts/geom_lib.py` (mètriques de geometria) i
 `scripts/embed_lib.py` (ajudes de tokenització + extracció), totes dues

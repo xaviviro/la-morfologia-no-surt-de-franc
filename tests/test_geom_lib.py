@@ -151,3 +151,26 @@ def test_benjamini_hochberg_monotone_and_ge_p():
 def test_benjamini_hochberg_preserves_nan():
     q = benjamini_hochberg([0.01, np.nan, 0.04])
     assert np.isnan(q[1]) and not np.isnan(q[0])
+
+
+def test_spearman_perfect_monotone():
+    from scripts.geom_lib import spearman_r
+    assert spearman_r([1, 2, 3, 4], [10, 20, 30, 40]) == pytest.approx(1.0)
+    assert spearman_r([1, 2, 3, 4], [40, 30, 20, 10]) == pytest.approx(-1.0)
+
+
+def test_spearman_handles_ties_and_nan():
+    from scripts.geom_lib import spearman_r
+    import numpy as np
+    r = spearman_r([1, 1, 2, 3], [1, 2, 2, 3])
+    assert -1.0 <= r <= 1.0
+    assert not np.isnan(spearman_r([1, 2, np.nan, 3], [3, 2, 5, 1]))
+
+
+def test_bootstrap_diff_ci_positive_when_a_higher():
+    from scripts.geom_lib import bootstrap_diff_ci
+    rng = np.random.default_rng(0)
+    a = rng.normal(0.6, 0.05, size=6)
+    b = rng.normal(0.5, 0.05, size=4)
+    mean, lo, hi, p = bootstrap_diff_ci(a, b, n=500, seed=1)
+    assert mean > 0 and lo < mean < hi

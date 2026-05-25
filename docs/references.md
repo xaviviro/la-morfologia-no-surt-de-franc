@@ -1,7 +1,38 @@
 # Referències i treball relacionat
 
 Estudis anteriors sobre els quals es construeix aquest treball, agrupats per
-tema. Per a cada bloc s'indica la relació amb el nostre estudi.
+tema. Per a cada bloc s'indica la relació amb el nostre estudi. El marc teòric
+sobre regularitat morfològica i arbitrarietat és a
+[`morphology-background.md`](morphology-background.md).
+
+---
+
+## 0. Morfologia indoeuropea, regularitat i arbitrarietat
+
+- **Lundquist & Yates (2018).** *The Morphology of Proto-Indo-European*, dins
+  Klein, Joseph & Fritz (eds.), *Handbook of Comparative and Historical
+  Indo-European Linguistics* (de Gruyter). Estructura arrel + sufix derivatiu +
+  desinència que el català hereta.
+- **Fortson (2010).** *Indo-European Language and Culture: An Introduction*
+  (2a ed., Wiley-Blackwell) — manual estàndard de morfologia IE.
+- **Osthoff & Brugmann (1878).** *Morphologische Untersuchungen* (pròleg) — el
+  manifest neogramàtic: el canvi fonètic és **exceptionless**, però crea
+  irregularitat morfològica (paradoxa de Sturtevant). La tensió que mesurem.
+- **Hopper & Traugott (2003).** *Grammaticalization* (2a ed., Cambridge UP) —
+  el *cline* mot lèxic → afix; **bleaching** semàntic + **erosió** fonètica
+  (p. ex. `-ment` < llatí MENTE).
+- **Bybee, Perkins & Pagliuca (1994).** *The Evolution of Grammar* — la
+  *parallel reduction hypothesis* (desemantització ⇒ erosió amb la freqüència).
+- **Dingemanse, Blasi, Lupyan, Christiansen & Monaghan (2015).**
+  *Arbitrariness, Iconicity, and Systematicity in Language.* Trends in
+  Cognitive Sciences. [doi:10.1016/j.tics.2015.07.013](https://doi.org/10.1016/j.tics.2015.07.013)
+  — arbitrarietat al mot, sistematicitat a la categoria.
+- **Monaghan, Christiansen & Fitneva (2011).** *The Arbitrariness of the Sign:
+  Learning Advantages from the Structure of the Vocabulary.* JEP: General.
+- **Baayen (1992 i seg.).** *Quantitative Aspects of Morphological
+  Productivity.* Yearbook of Morphology — mesures de productivitat per afix; la
+  base de la hipòtesi "més productiu ⇒ més regular" que provem (i falsem) a
+  [`findings.md`](findings.md) §10.
 
 ---
 

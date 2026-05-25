@@ -183,6 +183,49 @@ def bootstrap_mean_ci(values, n: int = 1000, seed: int = 0, alpha: float = 0.05)
             float(np.quantile(means, 1 - alpha / 2)))
 
 
+def _rankdata(x: np.ndarray) -> np.ndarray:
+    """Average ranks (1-based), ties averaged — like scipy.stats.rankdata."""
+    x = np.asarray(x, dtype=np.float64)
+    order = np.argsort(x, kind="mergesort")
+    ranks = np.empty(len(x), dtype=np.float64)
+    ranks[order] = np.arange(1, len(x) + 1, dtype=np.float64)
+    # average ties
+    _, inv, counts = np.unique(x, return_inverse=True, return_counts=True)
+    sums = np.zeros(len(counts))
+    np.add.at(sums, inv, ranks)
+    return (sums / counts)[inv]
+
+
+def spearman_r(a, b) -> float:
+    """Spearman rank correlation (Pearson on ranks). NaN-safe (drops pairs)."""
+    a = np.asarray(a, dtype=np.float64)
+    b = np.asarray(b, dtype=np.float64)
+    mask = ~(np.isnan(a) | np.isnan(b))
+    a, b = a[mask], b[mask]
+    if len(a) < 2:
+        return float("nan")
+    ra, rb = _rankdata(a), _rankdata(b)
+    ra = ra - ra.mean()
+    rb = rb - rb.mean()
+    denom = np.sqrt((ra**2).sum() * (rb**2).sum())
+    return float((ra * rb).sum() / denom) if denom > 0 else float("nan")
+
+
+def bootstrap_diff_ci(group_a, group_b, n: int = 1000, seed: int = 0, alpha: float = 0.05):
+    """Two-sample bootstrap CI + two-sided p for mean(a) − mean(b) (unpaired)."""
+    a = np.asarray(group_a, dtype=np.float64)
+    b = np.asarray(group_b, dtype=np.float64)
+    a, b = a[~np.isnan(a)], b[~np.isnan(b)]
+    if len(a) == 0 or len(b) == 0:
+        return (float("nan"), float("nan"), float("nan"), float("nan"))
+    rng = np.random.default_rng(seed)
+    diffs = np.array([a[rng.integers(0, len(a), len(a))].mean()
+                      - b[rng.integers(0, len(b), len(b))].mean() for _ in range(n)])
+    lo = float(np.quantile(diffs, alpha / 2))
+    hi = float(np.quantile(diffs, 1 - alpha / 2))
+    return float(a.mean() - b.mean()), lo, hi, _two_sided_p(diffs)
+
+
 def benjamini_hochberg(pvalues) -> np.ndarray:
     """Benjamini–Hochberg FDR-adjusted q-values for a 1D array of p-values.
     NaNs are preserved (excluded from the correction)."""

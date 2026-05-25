@@ -399,6 +399,38 @@ def fig_morfessor_agreement(agree: pd.DataFrame, path: Path) -> None:
     plt.close()
 
 
+def fig_regularity(analysis: pd.DataFrame, path: Path) -> None:
+    """Consistència de direcció (flexió vs derivació) per condició de segmentació.
+    La línia a 1,0 és la regularitat morfèmica perfecta; el 'sostre' real amb
+    tall morfèmic (~0,6) mostra la desviació residual per arbitrarietat,
+    UNIFORME entre flexió i derivació (no concentrada en la derivació)."""
+    cond_ca = {"native": "nadiu", "morphemic": "morfèmic (oracle)",
+               "morfessor": "Morfessor"}
+    conds = [c for c in ("native", "morphemic", "morfessor") if c in set(analysis.condition)]
+    x = np.arange(len(conds))
+    w = 0.38
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+    for mt, label, color, off in [
+            ("inflectional", "flexió", "#1f77b4", -w / 2),
+            ("derivational", "derivació", "#ff7f0e", +w / 2)]:
+        means = []
+        for c in conds:
+            sub = analysis[(analysis.condition == c) & (analysis.morph_type == mt)]
+            means.append(sub["consistency"].mean())
+        ax.bar(x + off, means, w, label=label, color=color)
+    ax.axhline(1.0, color="red", ls="--", lw=1, label="regularitat perfecta (=1,0)")
+    ax.set_xticks(x, [cond_ca[c] for c in conds])
+    ax.set_ylim(0, 1.05)
+    ax.set_ylabel("consistència de direcció")
+    ax.set_title("Regularitat morfèmica a escala: flexió vs derivació\n"
+                 "amb tall morfèmic convergeixen (~0,6), molt per sota de l'1,0 perfecte")
+    ax.legend()
+    plt.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+
 def main() -> None:
     from transformers import AutoTokenizer
 
@@ -424,6 +456,10 @@ def main() -> None:
     morf_path = ROOT / "out" / "morfessor_agreement.csv"
     if morf_path.exists():
         fig_morfessor_agreement(pd.read_csv(morf_path), FIGS / "morfessor_agreement.png")
+
+    reg_path = ROOT / "out" / "regularity_analysis.csv"
+    if reg_path.exists():
+        fig_regularity(pd.read_csv(reg_path), FIGS / "regularity.png")
 
     examples = [
         ("ràpidament", "ràpida|ment"),

@@ -254,6 +254,47 @@ en els cinc models** (p. ex. `gemma-2-2b` L6 +0,124 → L15 +0,090 → L22 +0,08
 profunditat però sense canviar de signe (`out/figs/layer_robustness.png`). Els
 IC i p-valors es calculen ara a totes les capes, no només a la més profunda.
 
+## 10. Regularitat morfèmica indoeuropea: es manté, però incompleta i uniforme
+
+La teoria morfològica (productivitat de Baayen; flexió > derivació) prediria que
+els morfemes **flexius** són més regulars que els **derivatius** i, per tant,
+geometria més neta. Provem aquesta hipòtesi amb les 10 famílies catalanes,
+etiquetades a priori a `data/family_traits.csv` (vegeu
+[`morphology-background.md`](morphology-background.md) §5).
+
+Consistència de direcció (mitjana sobre models, capa profunda), flexió vs
+derivació, per condició de segmentació:
+
+| condició | global | flexió | derivació | diff (flexió − deriv.) [IC 95 %] |
+| --- | --: | --: | --: | --- |
+| nadiu | 0,52 | 0,497 | 0,559 | −0,062 [−0,182, +0,071] |
+| morfèmic (oracle) | 0,60 | 0,599 | 0,595 | +0,004 [−0,087, +0,097] |
+| Morfessor | 0,59 | 0,578 | 0,615 | −0,037 [−0,136, +0,068] |
+
+**La hipòtesi no es confirma.** En cap condició la diferència flexió−derivació
+és distingible de zero (tots els IC creuen el zero; el Spearman amb el rang de
+transparència és fins i tot lleugerament *positiu*, el contrari del previst).
+Dues lectures importants i honestes:
+
+1. **La regularitat morfèmica es manté a escala, però és incompleta.** Amb el
+   tall morfèmic correcte la consistència convergeix a **~0,60** a tota la
+   morfologia, no a 1,0. La "desviació per arbitrarietat" (canvi fonètic
+   regular, gramaticalització, lexicalització; §3 del rerefons) és **real i
+   substancial** —rebaixa la regularitat ~40 % respecte al màxim— però es manté
+   en el mateix nivell residual i clarament mesurable.
+
+2. **La desviació és uniforme, no concentrada en la derivació.** Amb el tall
+   morfèmic, flexió i derivació són pràcticament idèntiques (0,599 vs 0,595). El
+   que separava la flexió en la condició nadiua (0,50 vs 0,56) **no és menys
+   regularitat lingüística sinó més dany de tokenització**: la flexió catalana
+   (afixos curts) es fragmenta de manera que perjudica més la geometria nadiua,
+   i per això és la que més es recupera amb el tall morfèmic (§4). La geometria
+   nadiua barreja morfologia amb tokenització; només el tall morfèmic aïlla la
+   regularitat del morfema.
+
+Vegeu `out/figs/regularity.png`, `out/regularity_analysis.csv` i
+`out/regularity_summary.csv`.
+
 ---
 
 ## Titular

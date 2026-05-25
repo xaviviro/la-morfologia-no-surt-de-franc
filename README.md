@@ -49,6 +49,13 @@ correctes recupera estructura composicional. Cinc resultats:
    *empitjora* la geometria, confirmant que la millora és específica dels
    morfemes.
 
+6. **La regularitat morfèmica indoeuropea es manté a escala, però incompleta.**
+   Amb el tall morfèmic correcte, la composicionalitat convergeix a ~0,60 (no a
+   1,0) de manera **uniforme** entre flexió i derivació: la desviació per
+   arbitrarietat històrica és real però compartida, no concentrada en cap tipus.
+   La hipòtesi clàssica "flexió més regular que derivació" **no es confirma**
+   geomètricament (vegeu [`docs/morphology-background.md`](docs/morphology-background.md)).
+
 > Els models del BSC (Salamandra / ALIA) s'inclouen com a control
 > *català-aware* i es descriuen de manera neutra al llarg de tot l'estudi.
 
@@ -130,6 +137,17 @@ oracle (0,60).
 El guany morfèmic és **positiu a les tres profunditats de capa** en els cinc
 models, no és un artefacte de triar una capa concreta.
 
+### Es manté la regularitat del morfema indoeuropeu a escala?
+
+![Regularitat: flexió vs derivació](out/figs/regularity.png)
+
+Amb el tall morfèmic, flexió i derivació convergeixen a **~0,60** (no a l'1,0
+perfecte): la regularitat morfèmica **es manté i és mesurable**, però la
+desviació per arbitrarietat històrica (canvi fonètic, gramaticalització,
+lexicalització) és real i **uniforme** entre tipus. La hipòtesi "flexió més
+regular que derivació" no es confirma. Fons teòric a
+[`docs/morphology-background.md`](docs/morphology-background.md).
+
 ### El sufix protagonista: `-ment`
 
 ![El sufix -ment: nadiu vs morfèmic](out/figs/ment_summary.png)
@@ -195,6 +213,7 @@ entrenat amb una proporció no trivial de català.
 | els resultats + xifres | [`docs/findings.md`](docs/findings.md) |
 | què **no** afirma l'estudi | [`docs/limitations.md`](docs/limitations.md) |
 | com regenerar-ho tot | [`docs/reproduce.md`](docs/reproduce.md) |
+| rerefons morfològic (regularitat IE vs arbitrarietat) | [`docs/morphology-background.md`](docs/morphology-background.md) |
 | treball relacionat i referències | [`docs/references.md`](docs/references.md) |
 
 > Tota la documentació (README, `docs/`) i el text dels gràfics són en català.
