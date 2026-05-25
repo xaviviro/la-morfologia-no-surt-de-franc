@@ -6,6 +6,7 @@ from scripts.m06_figs import (
     fig_delta_heatmap,
     fig_fertility_ratio,
     fig_layer_robustness,
+    fig_minimal_pairs,
     fig_ment_delta_forest,
     fig_morfessor_agreement,
     fig_placebo,
@@ -146,4 +147,17 @@ def test_fig_delta_heatmap_writes_png(tmp_path):
 def test_fig_ment_delta_forest_writes_png(tmp_path):
     p = tmp_path / "forest.png"
     fig_ment_delta_forest(_synth_metrics(), p)
+    assert p.exists() and p.stat().st_size > 0
+
+
+def test_fig_minimal_pairs_writes_png(tmp_path):
+    import pandas as pd
+    summ = pd.DataFrame({
+        "phenomenon": ["number", "gender_art", "ALL"],
+        "n": [60, 30, 90],
+        "acc_native": [0.85, 0.93, 0.88],
+        "acc_morphemic": [0.03, 0.47, 0.18],
+    })
+    p = tmp_path / "mp.png"
+    fig_minimal_pairs(summ, p)
     assert p.exists() and p.stat().st_size > 0

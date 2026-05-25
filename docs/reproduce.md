@@ -63,6 +63,8 @@ uv run python scripts/m07_regularity.py   # regularitat: flexió vs derivació
 uv run python scripts/m08_ie_patterns.py  # prefixació, Sturtevant, profunditat
 uv run python scripts/m09_carrier_robustness.py  # robustesa de portadora (menció vs ús)
 uv run python scripts/m10_romance.py      # rèplica romànica (CA vs ES)
+uv run python scripts/m11_probe.py        # validació: probe lineal de trets
+uv run python scripts/m12_minimal_pairs.py # validació: parells mínims (GPU)
 uv run python scripts/m05_figs.py
 uv run python scripts/m06_figs.py   # figures explicatives extra
 # -> out/figs/*.png
@@ -83,6 +85,8 @@ uv run python scripts/m06_figs.py   # figures explicatives extra
 | `m08_ie_patterns.py` | mètriques | `out/ie_*.csv` | no |
 | `m09_carrier_robustness.py` | npz + metadata | `out/carrier_robustness.csv` | no |
 | `m10_romance.py` | mètriques | `out/romance_comparison.csv` | no |
+| `m11_probe.py` | npz + metadata | `out/probe_accuracy.csv` | no |
+| `m12_minimal_pairs.py` | `data/minimal_pairs.csv` | `out/minimal_pairs_*.csv` | sí |
 | `rule_seg.py` | lèxic | `out/rule_seg_agreement.csv` | no |
 
 La lògica pura viu a `scripts/geom_lib.py` (mètriques de geometria) i

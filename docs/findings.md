@@ -386,6 +386,44 @@ castellà) més una germànica (anglès, *baseline*)— però **no** una univers
 plena: l'IE és tipològicament molt més divers (eslau, indi, grec…) i tres
 llengües en són una mostra petita (vegeu [`limitations.md`](limitations.md)).
 
+## 14. Validació en tasca: la geometria millora, el comportament (encara) no
+
+Tots els resultats anteriors són **geometria**. Per provar si això es tradueix
+en **comportament**, fem dues proves. La conclusió, honesta, és que el benefici
+de la segmentació morfèmica és **intern** i **no es manifesta en comportament
+sense reentrenar** — el que motiva la Part 2.
+
+**(a) *Probe* lineal de trets** (Edmiston 2020): entrenem un classificador lineal
+sobre els embeddings per predir nombre i gènere (CV per lema). Resultat:
+
+| tret | precisió nadiua | precisió morfèmica | Δ |
+| --- | --: | --: | --: |
+| nombre | 0,917 | 0,928 | +0,010 |
+| gènere | 0,878 | 0,854 | −0,023 |
+
+El tret morfològic **ja és linealment molt accessible** amb la tokenització
+nadiua (~0,88–0,92), i la segmentació morfèmica **no el mou** (Δ ≈ 0). El que la
+segmentació millora és la **composicionalitat** (direccions reutilitzables,
+analogia §4), no la decodabilitat del tret, que ja està saturada
+(`out/probe_accuracy.csv`).
+
+**(b) Parells mínims d'acceptabilitat** (BLiMP-style): el model hauria d'assignar
+més log-probabilitat a la frase gramatical (*He vist dos **gats***) que a
+l'agramatical (*…dos **gat***). Amb tokenització **nadiua** els models encerten
+el **90 %** dels parells — *ja saben* la morfologia. Però quan **forcem** la
+segmentació morfèmica (`gat|s`) de la forma correcta via empalmament d'ids, la
+precisió **cau a 0,18** (0/108 parells milloren, sign-test p < 0,001).
+
+La interpretació és clau: empalmar `gat|s` crea una **seqüència de tokens que el
+model mai ha vist** (out-of-distribution), i això la fa improbable —no perquè
+sigui agramatical sinó perquè els ids són "estranys" per al model. És a dir: **la
+segmentació morfèmica neteja la geometria interna, però el model no la sap "usar"
+en log-probabilitat perquè no s'hi va entrenar.** Aquest és precisament el motiu
+de la **Part 2** (un *full fine-tuning* amb segmentació morfèmica): només
+reentrenant es pot esperar que el benefici geomètric es converteixi en
+comportament. Vegeu `out/figs/minimal_pairs.png`,
+`out/minimal_pairs_summary.csv`.
+
 ---
 
 ## Titular

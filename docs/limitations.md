@@ -53,13 +53,19 @@ citades poden ser atípiques. Faltaria una comprovació de robustesa amb 2–3
 portadores (alguna d'ús normal) per descartar que la geometria sigui un
 artefacte de la portadora.
 
-## Estudi intrínsec, sense ancoratge a tasca
+## Ancoratge a tasca: parcial, i amb un resultat aliccionador
 
-Tot l'estudi és **geometria**, no comportament. La pregunta "i això quant canvia
-el rendiment?" queda oberta. El pont seria una tasca de *probing* morfològic
-(concordança de gènere/nombre, *cloze* morfològic) sota les tres condicions, i
-la connexió fertilitat→rendiment de Goldman et al. (2024). És l'addició
-d'impacte més gran pendent.
+La major part de l'estudi és **geometria**. La validació en tasca (findings §14)
+ja s'ha fet en dues formes — *probe* lineal de trets (Edmiston-style) i parells
+mínims d'acceptabilitat (BLiMP-style) — amb un resultat honest: la decodabilitat
+de trets ja és alta nativament (el *probe* no millora), i **forçar** la
+segmentació morfèmica via empalmament d'ids **empitjora** la log-probabilitat
+(la seqüència és *out-of-distribution* per al model). És a dir: el benefici és
+**intern (geometria)** i **no es trasllada a comportament sense reentrenar**. La
+peça que falta —i que ho tancaria— és la **Part 2**: un *full fine-tuning* amb el
+tokenitzador morfèmic (factible en una H200), per veure si llavors el guany
+geomètric esdevé guany de comportament. La connexió fertilitat→rendiment de
+Goldman et al. (2024) és el marc d'aquesta validació.
 
 ## La segmentació oracle no és un sistema desplegable
 

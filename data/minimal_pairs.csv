@@ -1,0 +1,31 @@
+phenomenon,prefix,good_focus,bad_focus,suffix,good_gold
+number,Tinc dos ,gats,gat, a casa.,gat|s
+number,He comprat tres ,llibres,llibre, nous.,llibre|s
+number,Hi ha molts ,arbres,arbre, al parc.,arbre|s
+number,Veig quatre ,ocells,ocell, al cel.,ocell|s
+number,Tenim diversos ,problemes,problema, per resoldre.,problema|s
+number,Hi havia molts ,cotxes,cotxe, al carrer.,cotxe|s
+number,Han vingut cinc ,amics,amic, a sopar.,amic|s
+number,Porto dues ,flors,flor, a la mà.,flor|s
+number,Hi ha moltes ,cases,casa, al poble.,casa|s
+number,Tinc tres ,gots,got, a taula.,got|s
+number,He vist sis ,peixos,peix, a l'aquari.,peix|os
+number,Hi ha molts ,boscos,bosc, per la zona.,bosc|os
+gender_art,He vist una ,gata,gato, al jardí.,gat|a
+gender_art,Hi ha una ,nena,neno, jugant.,nen|a
+gender_art,És una ,professora,professoro, excel·lent.,professor|a
+gender_art,Tenim una ,doctora,doctoro, nova.,doctor|a
+gender_art,Va venir una ,senyora,senyoro, gran.,senyor|a
+gender_art,Hi ha una ,filla,fillo, petita.,fill|a
+gender_adj,La casa és molt ,bonica,bonico,.,bonic|a
+gender_adj,La nena està ,contenta,contento,.,content|a
+gender_adj,Aquesta història és ,llarga,llargo,.,llarg|a
+gender_adj,La sopa està ,bona,bono,.,bon|a
+gender_adj,La taula és ,blanca,blanco,.,blanc|a
+gender_adj,La porta està ,oberta,oberto,.,obert|a
+nadj_number,Tinc uns gats molt ,bonics,bonic, a casa.,bonic|s
+nadj_number,Hi ha cases ,noves,nova, al barri.,nov|es
+nadj_number,Són uns llibres ,interessants,interessant,.,interessant|s
+nadj_number,Veig uns arbres molt ,alts,alt,.,alt|s
+nadj_number,Hi ha unes flors ,vermelles,vermella,.,vermell|es
+nadj_number,Tenim uns amics ,simpàtics,simpàtic,.,simpàtic|s

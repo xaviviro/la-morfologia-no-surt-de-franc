@@ -50,7 +50,7 @@ def boundary_set(pieces: list[str]) -> set[int]:
     return cuts
 
 
-def agreement_with_gold(df) -> "list[dict]":
+def agreement_with_gold(df) -> list[dict]:
     """Per Catalan derived word: precision/recall of rule cuts vs the gold
     morpheme boundary."""
     from scripts.embed_lib import gold_boundaries

@@ -433,6 +433,30 @@ def fig_regularity(analysis: pd.DataFrame, path: Path) -> None:
     plt.close()
 
 
+def fig_minimal_pairs(summ: pd.DataFrame, path: Path) -> None:
+    """Acceptabilitat de parells mínims: precisió nadiua vs morfèmica per fenomen.
+    Mostra que forçar la segmentació morfèmica via empalmament d'ids (out-of-
+    distribution) empitjora el comportament de log-prob, malgrat la millora
+    geomètrica — motiva el reentrenament (Part 2)."""
+    d = summ[summ.phenomenon != "ALL"]
+    x = np.arange(len(d))
+    w = 0.38
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+    ax.bar(x - w / 2, d.acc_native, w, label="nadiu", color="#bdbdbd")
+    ax.bar(x + w / 2, d.acc_morphemic, w, label="morfèmic (empalmat)", color="#1b9e77")
+    ax.axhline(0.5, color="red", ls="--", lw=1, label="atzar (0,5)")
+    ax.set_xticks(x, d.phenomenon, rotation=20)
+    ax.set_ylim(0, 1.05)
+    ax.set_ylabel("precisió (prefereix la forma correcta)")
+    ax.set_title("Parells mínims: el model ja encerta amb tokenització nadiua,\n"
+                 "però l'empalmament morfèmic (no entrenat) ho empitjora — cal reentrenar")
+    ax.legend()
+    plt.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+
 def fig_carrier_robustness(cr: pd.DataFrame, path: Path) -> None:
     """Scatter del delta morfèmic (oracle−nadiu, direcció) sota la portadora de
     menció vs la d'ús, per (model, família). Si els punts cauen prop de la
@@ -515,6 +539,10 @@ def main() -> None:
     cr_path = ROOT / "out" / "carrier_robustness.csv"
     if cr_path.exists():
         fig_carrier_robustness(pd.read_csv(cr_path), FIGS / "carrier_robustness.png")
+
+    mp_path = ROOT / "out" / "minimal_pairs_summary.csv"
+    if mp_path.exists():
+        fig_minimal_pairs(pd.read_csv(mp_path), FIGS / "minimal_pairs.png")
 
     examples = [
         ("ràpidament", "ràpida|ment"),

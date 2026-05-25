@@ -164,3 +164,17 @@ def embed_span(model, input_ids: list[int], span: tuple[int, int], layers: list[
         vec = vec / vec.norm().clamp(min=1e-12)
         result[L] = vec.detach().cpu().numpy().astype(np.float32)
     return result
+
+
+@torch.inference_mode()
+def sequence_logprob(model, input_ids: list[int]) -> float:
+    """Total log-probability the model assigns to `input_ids` under teacher
+    forcing: sum of log p(token_i | token_<i) for i >= 1. Used for minimal-pair
+    acceptability (BLiMP-style): the model should prefer the grammatical form."""
+    ids = torch.tensor([input_ids], device=model.device)
+    out = model(ids, use_cache=False)
+    logp = torch.log_softmax(out.logits[0].float(), dim=-1)  # [seq, vocab]
+    total = 0.0
+    for i in range(1, len(input_ids)):
+        total += float(logp[i - 1, input_ids[i]])
+    return total

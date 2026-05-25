@@ -17,7 +17,7 @@ protagonista.
 
 Hem mesurat com els tokenitzadors dels grans models de llenguatge tallen la
 morfologia catalana, i hem provat si imposar les fronteres morfèmiques
-correctes recupera estructura composicional. Vuit resultats:
+correctes recupera estructura composicional. Nou resultats:
 
 1. **El català es fragmenta molt més que l'anglès.** Als models
    anglo-dominants (Gemma, Qwen, Mistral) una paraula catalana costa **~1,7×**
@@ -70,6 +70,14 @@ correctes recupera estructura composicional. Vuit resultats:
    patró estable a través de tres llengües indoeuropees, sense pretensió
    d'universalitat plena.
 
+9. **La geometria millora, però el comportament necessita reentrenar.** Validació
+   en tasca: els models ja prefereixen les formes morfològicament correctes amb
+   tokenització nadiua (parells mínims, 90%), i un *probe* lineal ja decodifica
+   nombre/gènere (~0,9). **Forçar** la segmentació morfèmica a un model ja
+   entrenat **empitjora** el comportament (la seqüència li és desconeguda). El
+   benefici és **intern**; capturar-lo en comportament demana un *full
+   fine-tuning* amb el tokenitzador morfèmic — la **Part 2** d'aquest estudi.
+
 > Els models del BSC (Salamandra / ALIA) s'inclouen com a control
 > conscient del català i es descriuen de manera neutra al llarg de tot l'estudi.
 
@@ -77,9 +85,10 @@ correctes recupera estructura composicional. Vuit resultats:
 
 ## Conclusions pràctiques
 
-> ⚠️ L'estudi és **intrínsec** (mesura geometria de l'espai latent), no de
-> rendiment en tasca. El que segueix són **implicacions plausibles** d'aquestes
-> troballes, pendents de validació en una tasca real (vegeu
+> ⚠️ L'estudi és **principalment intrínsec** (mesura geometria de l'espai
+> latent). La validació en tasca (findings §14) matisa el punt 4: el benefici de
+> la segmentació morfèmica és **intern** i **no es trasllada a comportament sense
+> reentrenar**. La resta de punts són **implicacions plausibles** (vegeu
 > [`docs/limitations.md`](docs/limitations.md)).
 
 1. **El català surt car de tokenitzar, i això té conseqüències de cost.** Una
@@ -98,12 +107,15 @@ correctes recupera estructura composicional. Vuit resultats:
    triar un tokenitzador només per fertilitat baixa **no** garanteix
    representacions morfològicament netes.
 
-4. **Pre-segmentar pels morfemes ajuda, i no cal una eina perfecta.** Forçar el
-   tall morfèmic millora la geometria composicional en tots els models, i un
-   segmentador de **regles** català senzill (o fins i tot Morfessor no
-   supervisat) ja recupera la major part del guany. Per a aplicacions sensibles
-   a la morfologia (flexió, derivació, cerca, normalització), val la pena
-   **provar una pre-segmentació morfèmica** abans de tokenitzar.
+4. **Pre-segmentar pels morfemes neteja la geometria, però NO n'hi ha prou
+   sense reentrenar.** Forçar el tall morfèmic millora la geometria composicional
+   en tots els models (i un segmentador de **regles** català, recall 0,78, ja
+   iguala l'oracle). **Però** la validació en tasca mostra que *afegir* aquesta
+   segmentació a un model ja entrenat **empitjora** el comportament en
+   log-probabilitat (la seqüència d'ids li resulta desconeguda): el benefici
+   només es pot capturar **reentrenant** el model amb el tokenitzador morfèmic
+   (la "Part 2" d'aquest estudi). La lliçó pràctica: la consciència morfèmica és
+   una propietat del *pipeline d'entrenament*, no un pegat d'inferència.
 
 5. **Vigila l'ela geminada (`l·l`) en textos tècnics/acadèmics.** És el cas
    patològic (~4 *tokens* per paraula, i ni els tokenitzadors catalans la
@@ -205,6 +217,17 @@ través de tres llengües indoeuropees.
 
 El guany morfèmic és **positiu a les tres profunditats de capa** en els cinc
 models, no és un artefacte de triar una capa concreta.
+
+### Validació en tasca: la geometria millora, el comportament necessita reentrenar
+
+![Parells mínims: nadiu vs morfèmic](out/figs/minimal_pairs.png)
+
+Amb tokenització **nadiua** els models ja prefereixen la forma morfològicament
+correcta (parells mínims, 90% de precisió). Però **forçar** la segmentació
+morfèmica per empalmament d'ids **enfonsa** la precisió (a 0,18): la seqüència
+resultant és *out-of-distribution* per a un model que no s'hi va entrenar. El
+benefici de la segmentació morfèmica és, doncs, **intern** (geometria) i només es
+podrà capturar en comportament **reentrenant** (Part 2).
 
 ### Es manté la regularitat del morfema indoeuropeu a escala?
 
