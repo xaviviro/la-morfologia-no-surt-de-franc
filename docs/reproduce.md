@@ -52,7 +52,8 @@ la taula de concordança Morfessor↔gold pots executar
 
 ```bash
 uv run python scripts/m04_geometry.py
-# -> out/geometry_metrics.csv  (5 models x 3 capes x 11 famílies x {nadiu,morfèmic,delta})
+# -> out/geometry_metrics.csv (5 models x 3 capes x 21 famílies x
+#    {nadiu,morfèmic,aleatori,morfessor} + deltes) i out/geometry_aggregate_ci.csv
 ```
 
 ## 5. Figures

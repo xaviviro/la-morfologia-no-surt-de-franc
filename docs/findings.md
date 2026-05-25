@@ -1,7 +1,7 @@
 # Resultats
 
 > Les xifres són la sortida determinista dels scripts comesos sobre el lèxic
-> comès (**319 parells (base, derivat)**, 11 famílies). Les xifres de
+> comès (**441 parells (base, derivat)**, 21 famílies). Les xifres de
 > geometria són a la capa més profunda escombrada de cada model si no
 > s'indica el contrari. Vegeu [`methodology.md`](methodology.md) per a les
 > definicions de les mètriques.

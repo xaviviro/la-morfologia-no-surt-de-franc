@@ -62,7 +62,7 @@ es pot computar de manera fiable i es reporta com a `NaN`. La seva fertilitat
 - **L'elecció de capa** reutilitza els escombrats per model de l'estudi coca;
   s'usa la capa més profunda escombrada per a les xifres titulars. Els
   resultats a les tres capes escombrades són a `out/geometry_metrics.csv`.
-- **La mida del lèxic** és de 319 parells (24–40 per família); les estimacions
+- **La mida del lèxic** és de 441 parells (8–40 per família); les estimacions
   per família són més estables que la primera passada de ~150 parells però
   encara modestes. Per això els deltes per cel·la `(model, família)` ara porten
   un **IC 95 % per bootstrap** (a la capa més profunda; vegeu
@@ -78,9 +78,9 @@ es pot computar de manera fiable i es reporta com a `NaN`. La seva fertilitat
 ## Anàlisi de regularitat (flexió vs derivació)
 
 L'anàlisi de [`findings.md`](findings.md) §10 té dues limitacions. Primer, hi ha
-només **10 famílies catalanes**, així que els tests flexió-vs-derivació tenen
-poca potència (per això tots els IC creuen el zero — un *nul* amb n petita no és
-una prova forta d'absència d'efecte). Segon, les etiquetes de
+només **14 famílies catalanes amb tall morfèmic**, així que els tests
+flexió-vs-derivació tenen poca potència (els IC són amples — un *nul* amb n
+petita no és una prova forta d'absència d'efecte). Segon, les etiquetes de
 `data/family_traits.csv` (morph_type, transparency_rank) es basen en principis
 lingüístics estàndard, però **l'anotador ja coneixia els resultats geomètrics**,
 de manera que el rang de transparència no és estrictament cec; el predictor

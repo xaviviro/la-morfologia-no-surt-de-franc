@@ -191,23 +191,22 @@ Salamandra-2B (0,625 → 0,950).
 
 ## El lèxic
 
-Lèxic curat a mà (`data/morph_pairs.csv`, **319 parells** base→derivat, 11
-famílies, llicència CC-BY), revisat per l'autor (accents, la regla del femení
+Lèxic curat a mà (`data/morph_pairs.csv`, **441 parells** base→derivat, **21
+famílies**, llicència CC-BY), revisat per l'autor (accents, la regla del femení
 per a `-ment`, formes irregulars):
 
-| llengua | família | n | morfologia |
-| --- | --- | -: | --- |
-| ca | `ment` | 40 | adjectiu → adverbi, sobre el femení (`ràpid → ràpida → ràpidament`) |
-| ca | `dim_et` | 30 | diminutiu `-et/-eta` |
-| ca | `agent_dor` | 25 | agentiu `-dor` |
-| ca | `nom_cio` | 24 | nominalitzador `-ció` |
-| ca | `plural` | 30 | plural `-s/-os` |
-| ca | `verb_em` | 25 | 1a pl. present `-em` |
-| ca | `gender_a` | 25 | gènere `-a` |
-| en | `ly` | 40 | adverbi `-ly` (paral·lel a `-ment`) |
-| en | `agent_er` | 25 | agentiu `-er` |
-| en | `nom_tion` | 25 | nominalitzador `-tion`/`-ation` |
-| en | `plural_s` | 30 | plural `-s` |
+| grup | famílies | morfologia |
+| --- | --- | --- |
+| derivació CA | `ment`, `dim_et`, `agent_dor`, `nom_cio` | adverbial -ment, diminutiu -et, agentiu -dor, nominalitzador -ció |
+| flexió CA | `plural`, `verb_em`, `gender_a` | plural -s/-os, 1a pl. -em, gènere -a |
+| ortografia CA | `gem_lla`, `cedilla`, `ny` | plural amb ela geminada l·l, ç, dígraf ny |
+| prefixació CA | `pre_des`, `pre_re`, `pre_in` | prefixos des-, re-, in-/im- |
+| gradient verbal CA | `verb_reg`, `verb_alt`, `verb_supl` | regular → alternança d'arrel → suppletiu (1a sg present) |
+| profunditat CA | `nom_cio_d1` | -ció sobre base ja derivada (globalitzar→globalització) |
+| *baseline* EN | `ly`, `agent_er`, `nom_tion`, `plural_s` | adverbi -ly, agentiu -er, -tion, plural -s |
+
+La taula completa amb el detall de cada família és a
+[`docs/methodology.md`](docs/methodology.md) §2.
 
 ## El panell de models
 
