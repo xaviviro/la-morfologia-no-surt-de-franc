@@ -1,7 +1,7 @@
 # Resultats
 
-> Les xifres són la sortida determinista dels scripts comesos sobre el lèxic
-> comès (**441 parells (base, derivat)**, 21 famílies). Les xifres de
+> Les xifres són la sortida determinista dels scripts executats sobre el lèxic
+> d'aquest repositori (**441 parells (base, derivat)**, 21 famílies). Les xifres de
 > geometria són a la capa més profunda escombrada de cada model si no
 > s'indica el contrari. Vegeu [`methodology.md`](methodology.md) per a les
 > definicions de les mètriques.
@@ -36,15 +36,15 @@ anglo-dominant (`out/figs/fertility_by_family.png`).
 Recall mitjà de frontera de `-ment` (cau un tall de token a la frontera
 `tall|ment`?):
 
-| grup | recall de frontera de `-ment` |
+| grup | taxa de recuperació (*recall*) de frontera de `-ment` |
 | --- | --: |
 | anglo-dominants | 0,218 |
 | BSC català-aware | 0,200 |
-| DeepSeek 67B | n/d (offsets inservibles) |
+| DeepSeek 67B | n/d (desplaçaments inservibles) |
 
-Tots dos grups aïllen el sufix `-ment` només ~20 % de les vegades. **El
-tokenitzador català-aware fragmenta menys el català, però no talla per les
-fronteres de morfema més sovint que l'anglo-dominant** — sobretot manté
+Tots dos grups aïllen el sufix `-ment` només ~20% de les vegades. **El
+tokenitzador conscient del català fragmenta menys el català, però no talla per les
+fronteres de morfema més sovint que l'anglo-dominant** —sobretot manté
 paraules senceres en un sol token, amagant la costura del morfema a dins.
 La il·lustració de `out/figs/tokenization_examples.png` ho fa concret: Gemma
 parteix *ràpidament* com `rà|pid|ament` (la costura real `ràpida|ment` cau
@@ -61,30 +61,33 @@ anàloga anglesa `-ly` (capa més profunda, entre models):
 - `-ment` consistència de direcció nadiua ≈ 0,48–0,63, analogia ≈ 0,63–0,80.
 
 El sufix adverbial anglès ja viu en un subespai nadiu més net i lineal que el
-català — coherent amb el fet que el preentrenament i la tokenització
+català —coherent amb el fet que el preentrenament i la tokenització
 anglo-dominants representin la morfologia anglesa de manera més composicional
 (`out/figs/direction_consistency_bars.png`).
 
-## 4. Una segmentació de morfema oracle recupera geometria composicional
+## 4. Una segmentació de morfema oracle recupera la geometria composicional
 
-El contrafactual controlat (les mateixes paraules, re-segmentades per les
-fronteres de morfema oracle, pesos fixos) millora la geometria de mitjana als
-**cinc** models. `delta = morfèmic − nadiu` mitjà sobre les 7 famílies
-catalanes (capa més profunda):
+El contrafactual controlat (les mateixes paraules, resegmentades per les
+fronteres de morfema oracle, pesos fixos) millora la geometria de mitjana en els
+**cinc** models. `delta = morfèmic − nadiu` mitjà sobre les 14 famílies
+catalanes amb tall morfèmic (capa més profunda):
 
 | model | Δ consistència de direcció | Δ precisió d'analogia |
 | --- | --: | --: |
-| `gemma-2-2b` | +0,104 | +0,035 |
-| `gemma-4-E2B` | +0,028 | +0,065 |
-| `Qwen2-1.5B` | +0,026 | +0,036 |
-| `Qwen3.5-4B-Base` | +0,063 | +0,151 |
-| `salamandra-2b` | +0,180 | +0,006 |
+| `gemma-2-2b` | +0,108 | +0,047 |
+| `gemma-4-E2B` | +0,037 | +0,074 |
+| `Qwen2-1.5B` | +0,049 | +0,030 |
+| `Qwen3.5-4B-Base` | +0,071 | +0,139 |
+| `salamandra-2b` | +0,199 | +0,057 |
 
-Els deu deltes són positius. **Salamandra-2B — el model català-aware — és el
-que més guanya en consistència de direcció** (+0,180): el seu tokenitzador
-fragmenta menys el català, però imposar la segmentació *alineada amb els
-morfemes* encara recupera una direcció força més neta, reforçant §2 (menys
-fragmentació no és alineació morfèmica). Vegeu
+**Els deu deltes (5 models × 2 mètriques) són positius.** Sota la hipòtesi nul·la
+que cada signe fos una moneda justa, això és un **test de signes** amb
+**p = 0,0020** (exacte, bilateral; `geom_lib.sign_test`) — una de les evidències
+més fortes de l'estudi, ara reportada formalment. **Salamandra-2B —el model
+conscient del català— és el que més guanya en consistència de direcció**
+(+0,199): el seu tokenitzador fragmenta menys el català, però imposar la
+segmentació *alineada amb els morfemes* encara recupera una direcció força més
+neta, reforçant §2 (menys fragmentació no és alineació morfèmica). Vegeu
 `out/figs/delta_heatmap_direction.png` i
 `out/figs/delta_heatmap_analogy.png`.
 
@@ -110,7 +113,7 @@ arreu".
 
 Re-segmentar els adverbis en `-ment` mou els punts en la direcció esperada
 (consistència de direcció amunt en 4 de 5 models, analogia amunt en 4 de 5),
-però amb només ~40 parells els **IC 95 % per bootstrap aparellat** mostren que
+però amb només ~40 parells els **IC del 95% mitjançant bootstrap aparellat** mostren que
 no totes les cel·les són individualment distingibles de zero:
 
 | model | Δ consistència de direcció [IC 95 %] | Δ precisió d'analogia [IC 95 %] |
@@ -143,30 +146,30 @@ són a `out/geometry_metrics.csv` (columnes `*_ci_lo` / `*_ci_hi`).
 
 ## 5. El vincle transversal tokenització→geometria està confós
 
-Representar la consistència de direcció nadiua contra el recall de frontera
-nadiu per `(model, família)` **no** dona una correlació positiva neta
+Representar la consistència de direcció nadiua contra la taxa de recuperació de frontera
+nadiua per `(model, família)` **no** dona una correlació positiva neta
 (`out/figs/tok_vs_geom_scatter.png`). El motiu és un confusor de la mètrica:
-`recall de frontera = 0` barreja una paraula que rep el **seu propi token
+`taxa de recuperació de frontera = 0` barreja una paraula que rep el **seu propi token
 únic** (neta) i una paraula partida **lluny** de la seva frontera de morfema
 (bruta). El contrafactual controlat intra-paraula de §4 és l'evidència causal
-més neta; el scatter es reporta per transparència, no com a suport.
+més neta; el gràfic de dispersió (*scatter*) es reporta per transparència, no com a suport.
 
 ## 6. Trets ortogràfics catalans: el punt volat castiga el doble
 
 Tres famílies de plural addicionals aïllen un tret ortogràfic característic del
 català al radical, amb la morfologia (plural) constant:
 
-| família | exemple | fertilitat anglo | fertilitat BSC |
+| família | exemple | fertilitat anglo-dominant | fertilitat BSC |
 | --- | --- | --: | --: |
 | `gem_lla` — ela geminada `l·l` | col·legi → col·legis | **4,58** | **4,00** |
 | `cedilla` — c trencada `ç` | plaça → places | 2,22 | 1,77 |
 | `ny` — dígraf `ny` | muntanya → muntanyes | 2,40 | 1,83 |
 | `plural` (referència) | gat → gats | 2,05 | 1,33 |
 
-El **punt volat és el cas extrem**: tots dos tokenitzadors aïllen el `·` com a
+El **punt volat és el cas extrem**: tots dos tokenitzadors aïllen el punt volat (`·`) com a
 token propi (`col · leg is`), de manera que una paraula amb `l·l` costa ~4–4,6
-subparaules — gairebé el doble d'un plural normal, i **ni el tokenitzador
-català-aware ho comprimeix** (4,00 vs 4,58). La `ç` i el dígraf `ny` afegeixen
+subparaules —gairebé el doble d'un plural normal, i **ni el tokenitzador
+conscient del català ho comprimeix** (4,00 vs 4,58). La `ç` i el dígraf `ny` afegeixen
 un càstig menor; Gemma arriba a aïllar la `ç` (`ca ç ador`) i fins i tot a
 partir el dígraf (`an ys`), mentre que Salamandra els manté més sovint
 (`caç ador`, `anys`). Vegeu `out/figs/tokenization_examples_ortho.png`.
@@ -296,6 +299,14 @@ la derivació; el Spearman amb el rang de transparència és **positiu** (+0,4 a
    per això es recuperen més (§4). La geometria nadiua barreja morfologia amb
    tokenització; només el tall morfèmic aïlla la regularitat del morfema.
 
+> **Confusió de la composició del grup.** El grup "flexió" està dominat per
+> **plurals**: `plural`, `gem_lla`, `cedilla` i `ny` són tots plurals, i amb
+> `gender_a` i `verb_em` la categoria és de facto "plural+gènere+1pl vs tota la
+> resta". El contrast flexió-vs-derivació és, doncs, parcialment un contrast
+> *plural vs no-plural*; el resultat "la hipòtesi no es confirma" és real, però
+> aquesta confusió de composició el matisa i és per això que ens recolzem en el
+> contrast per condició (nadiu/morfèmic), no en l'etiqueta flexiu/derivatiu sola.
+
 Vegeu `out/figs/regularity.png`, `out/regularity_analysis.csv` i
 `out/regularity_summary.csv`.
 
@@ -337,13 +348,13 @@ Artefactes: `out/ie_sturtevant_gradient.csv`, `out/ie_patterns_summary.csv`.
 ## Titular
 
 El català es tokenitza ~1,7× més fi que l'anglès als models anglo-dominants
-(i fins a 1,9× a DeepSeek-67B); un vocabulari català-aware (BSC
+(i fins a 1,9× a DeepSeek-67B); un vocabulari conscient del català (BSC
 Salamandra/ALIA) ho redueix a 1,36×. Però menys fertilitat no implica
-alineació morfèmica — el sufix `-ment` només s'aïlla ~20 % de les vegades en
-*qualsevol* tokenitzador — i la morfologia anglesa parteix més composicional
+alineació morfèmica —el sufix `-ment` només s'aïlla ~20% de les vegades en
+*qualsevol* tokenitzador— i la morfologia anglesa parteix de manera més composicional
 que la catalana a l'estat ocult. Imposar una segmentació de morfema oracle en
-temps d'inferència recupera geometria composicional als cinc models petits,
+temps d'inferència recupera la geometria composicional en els cinc models petits,
 sobretot en flexió, cosa que suggereix que una tokenització conscient dels
-morfemes ("universal") exposaria estructura composicional que aquests models
+morfemes ("universal") exposaria una estructura composicional que aquests models
 ja codifiquen en part. Vegeu [`limitations.md`](limitations.md) per a què
 afirma i què no afirma això.

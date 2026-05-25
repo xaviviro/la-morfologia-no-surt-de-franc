@@ -226,6 +226,26 @@ def bootstrap_diff_ci(group_a, group_b, n: int = 1000, seed: int = 0, alpha: flo
     return float(a.mean() - b.mean()), lo, hi, _two_sided_p(diffs)
 
 
+def sign_test(values, n_total: int | None = None) -> tuple[int, int, float]:
+    """Two-sided sign test: are the signs of `values` more one-sided than chance?
+
+    Returns (n_positive, n_considered, p). Zeros are dropped. Under H0 (sign is a
+    fair coin) the count of the majority sign follows Binomial(n, 0.5); we return
+    the exact two-sided tail. With 10/10 same sign, p = 2·0.5^10 ≈ 0.002."""
+    v = np.asarray(values, dtype=np.float64)
+    v = v[~np.isnan(v) & (v != 0.0)]
+    n = len(v) if n_total is None else n_total
+    if n == 0:
+        return (0, 0, float("nan"))
+    pos = int(np.sum(v > 0))
+    k = max(pos, n - pos)
+    # exact two-sided binomial tail P(X>=k) + P(X<=n-k) under p=0.5
+    from math import comb
+    tail = sum(comb(n, i) for i in range(k, n + 1)) / (2.0**n)
+    p = min(1.0, 2.0 * tail)
+    return (pos, n, p)
+
+
 def benjamini_hochberg(pvalues) -> np.ndarray:
     """Benjamini–Hochberg FDR-adjusted q-values for a 1D array of p-values.
     NaNs are preserved (excluded from the correction)."""

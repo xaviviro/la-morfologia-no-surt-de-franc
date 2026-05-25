@@ -25,31 +25,31 @@ correctes recupera estructura composicional. Set resultats:
    (Salamandra / ALIA) **redueixen aquest cost a 1,36×**.
 
 2. **Menys fragmentació no vol dir alineació morfèmica.** Cap tokenitzador
-   del panell aïlla bé el sufix `-ment` (només ~20 % de les vegades). El
+   del panell aïlla bé el sufix `-ment` (només ~20% de les vegades). El
    tokenitzador del BSC fragmenta menys perquè manté paraules senceres en un
-   sol *token* — però això **amaga la frontera del morfema a dins**, no
+   sol *token* —però això **amaga la frontera del morfema a dins**, no
    l'exposa.
 
-3. **Una segmentació morfèmica oracle recupera geometria composicional.** Si
+3. **Una segmentació morfèmica d'origen (oracle) recupera la geometria composicional.** Si
    forcem el tall pels morfemes en temps d'inferència (sense reentrenar), la
-   **geometria millora als cinc models petits** — sobretot en flexió (gènere,
+   **geometria millora en els cinc models petits** —sobretot en flexió (gènere,
    plural) i en l'analogia de `-ment`. Això suggereix que una tokenització
-   "universal" conscient dels morfemes exposaria estructura que els models ja
+   "universal" conscient dels morfemes exposaria una estructura que els models ja
    codifiquen en part.
 
 4. **El punt volat (`l·l`) és el tret ortogràfic més castigat.** Una paraula
    amb ela geminada (*col·legi*) es parteix en ~4 *tokens* perquè tots dos
-   tokenitzadors aïllen el `·` com a token propi; ni tan sols el tokenitzador
-   català-aware ho comprimeix. La `ç` i el dígraf `ny` afegeixen un càstig
+   tokenitzadors aïllen el punt volat (`·`) com a token propi; ni tan sols el tokenitzador
+   conscient del català ho comprimeix. La `ç` i el dígraf `ny` afegeixen un càstig
    menor.
 
 5. **No cal un oracle.** Un segmentador morfèmic realista i no supervisat
    (Morfessor) gairebé iguala l'oracle en la millora geomètrica, i el guany es
-   manté a totes les profunditats de capa. El control placebo (tall aleatori)
+   manté en totes les profunditats de capa. El control placebo (tall aleatori)
    *empitjora* la geometria, confirmant que la millora és específica dels
    morfemes.
 
-6. **La regularitat morfèmica indoeuropea es manté a escala, però incompleta.**
+6. **La regularitat morfèmica indoeuropea es manté a escala, però és incompleta.**
    Amb el tall morfèmic correcte, la composicionalitat convergeix a ~0,64 (no a
    1,0): la desviació per arbitrarietat històrica és real i mesurable. La
    hipòtesi clàssica "flexió més regular que derivació" **no es confirma**
@@ -59,11 +59,12 @@ correctes recupera estructura composicional. Set resultats:
 7. **Patrons indoeuropeus (prefixació, Sturtevant, profunditat).** Els
    **prefixos** són els que més guanyen amb el tall morfèmic (delta +0,198, el
    més gran de l'estudi); el **gradient de Sturtevant** regular→irregular és una
-   tendència feble sense gradient net; i la **profunditat derivativa** és un
-   falsador — `-ció` sobre base derivada és *més* regular, no menys.
+   tendència feble sense gradient net; i la **profunditat derivativa** és una
+   evidència en contra (falsador) —l'afix `-ció` sobre base derivada és *més* regular, no
+   menys.
 
 > Els models del BSC (Salamandra / ALIA) s'inclouen com a control
-> *català-aware* i es descriuen de manera neutra al llarg de tot l'estudi.
+> conscient del català i es descriuen de manera neutra al llarg de tot l'estudi.
 
 ---
 

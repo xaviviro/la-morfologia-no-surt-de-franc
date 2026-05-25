@@ -16,10 +16,10 @@ morfologia en lloc d'una de col·lisió cultural.
 ## 1. Preguntes de recerca
 
 - **RQ1 — Descriptiva (nivell de tokenitzador, sense GPU).** Com segmenten la
-  morfologia catalana els tokenitzadors anglo-dominants vs els català-aware?
+  morfologia catalana els tokenitzadors anglo-dominants vs els conscients del català?
   Quantifiquem la **fertilitat** (subparaules per paraula) en conjunts de
-  paraules catalanes i angleses aparellats, i el **recall de frontera
-  morfèmica** — quan una paraula té una frontera de morfema coneguda
+  paraules catalanes i angleses aparellats, i la **taxa de recuperació (*recall*) de la frontera
+  morfèmica** —quan una paraula té una frontera de morfema coneguda
   (`ràpida|ment`, `gat|et`, `cant|em`), el tokenitzador hi posa una frontera
   de token?
 
@@ -59,14 +59,14 @@ gold_segmentation` (morfemes separats per barra), `morph_type, carrier`.
 | ca | `cedilla` | 13 | plural amb **ç** (`plaça → places`, `feliç → feliços`) |
 | ca | `ny` | 12 | plural amb el **dígraf ny** (`muntanya → muntanyes`) |
 | ca | `pre_des` / `pre_re` / `pre_in` | 12 ×3 | **prefixació** (`des-`, `re-`, `in-/im-`) — l'estudi era altrament tot sufixal |
-| ca | `verb_reg` / `verb_alt` / `verb_supl` | 15/15/8 | **gradient de Sturtevant** verbal (1a sg present): regular → alternança d'arrel → suppletiu |
-| ca | `nom_cio_d1` | 12 | `-ció` sobre **base ja derivada** (`globalitzar→globalització`) — profunditat derivativa |
+| ca | `verb_reg` / `verb_alt` / `verb_supl` | 15/15/8 | **gradient de Sturtevant** verbal (1a sg present): regular → alternança d'arrel → supletivisme |
+| ca | `nom_cio_d1` | 12 | `-ció` sobre **base ja derivada** (`globalització`) — profunditat derivativa |
 | en | `ly` | 40 | adverbi `-ly` (paral·lel a `-ment`) |
 | en | `agent_er` | 25 | agentiu `-er` |
 | en | `nom_tion` | 25 | nominalitzador `-tion`/`-ation` |
 | en | `plural_s` | 30 | plural `-s` |
 
-`-ment` és el protagonista. Les famílies angleses són un *baseline* paral·lel:
+`-ment` és el protagonista. Les famílies angleses són una **referència (*baseline*)** paral·lela:
 permeten preguntar si un tokenitzador anglo-dominant representa la morfologia
 anglesa de manera més composicional que la catalana.
 
@@ -92,21 +92,21 @@ sense GPU) i cada paraula derivada:
 
 - **Fertilitat** `f(w)` = nombre de tokens subparaula per a `w` aïllada
   (`add_special_tokens=False`).
-- **Recall de frontera** = proporció de fronteres de morfema oracle de la
+- **Taxa de recuperació (*recall*) de frontera** = proporció de fronteres de morfema oracle de la
   paraula que coincideixen amb una frontera de token, llegida del
   `offset_mapping` de caràcters del *fast tokenizer*. Una paraula sense
-  frontera interna val 1.0 de manera vàcua.
+  frontera interna val 1,0 de manera vàcua.
 
-**Robustesa dels offsets.** Un tokenitzador la implementació *fast* del qual
-no exposa offsets alineats a caràcters (l'extrem final de l'últim token ≠ la
-longitud en caràcters de la paraula — p. ex. offsets en espai de bytes) dona
+**Robustesa dels desplaçaments (*offsets*).** Un tokenitzador la implementació *fast* del qual
+no exposa desplaçaments alineats a caràcters (l'extrem final de l'últim token ≠ la
+longitud en caràcters de la paraula —p. ex. desplaçaments en espai de bytes) dona
 una mètrica de frontera poc fiable; per a aquests casos emetem `NaN` en lloc
-d'un 0 enganyós. Això afecta `deepseek-llm-67b-base`, els offsets del qual
+d'un 0 enganyós. Això afecta `deepseek-llm-67b-base`, els desplaçaments del qual
 són en bytes (una `à` de dos bytes desincronitza les posicions de caràcter);
 la seva fertilitat continua sent vàlida i es reporta.
 
 **Diferència de fertilitat CA−EN.** Per a cada tokenitzador reportem el *gap*
-de fertilitat mitjana català−anglès amb un **IC 95 % per bootstrap de dues
+de fertilitat mitjana català−anglès amb un **IC del 95% mitjançant bootstrap de dues
 mostres** (català i anglès són paraules diferents, no aparellades);
 `out/fertility_gap_ci.csv`, via `m02_tokenize_audit.fertility_gap_ci`.
 
@@ -117,7 +117,7 @@ mostres** (català i anglès són paraules diferents, no aparellades);
 No podem reentrenar un model amb un tokenitzador nou, així que provem la
 pregunta més propera: **la representació existent del model es torna més
 composicional quan l'entrada se segmenta per les fronteres de morfema?**
-Imposem la segmentació **empalmant seqüències de token ids**, reutilitzant el
+Imposem la segmentació **empalmant seqüències d'identificadors de token (*token IDs*)**, reutilitzant el
 vocabulari i la taula d'embeddings propis del model.
 
 Per a una paraula derivada `w` amb morfemes oracle `[m_1, …, m_k]` dins d'una
@@ -127,9 +127,9 @@ portadora `PREFIX {w} SUFIX`, muntem els `input_ids` així:
 [bos?] + tok(PREFIX) + ids_de_la_paraula + tok(SUFIX)
 ```
 
-- **Condició nadiua:** `ids_de_la_paraula = tok(" " + w)` — una sola peça.
+- **Condició nadiua:** `ids_de_la_paraula = tok(" " + w)` —una sola peça.
 - **Condició morfèmica:** `ids_de_la_paraula = tok(" " + m_1) ++ tok(m_2) ++ …`
-  — la segmentació oracle.
+  —la segmentació oracle.
 - **Condició aleatòria (placebo):** el mateix nombre de peces que la morfèmica,
   però tallant per una posició interna **aleatòria que evita la frontera de
   morfema** (llavor determinista per paraula). És el control que distingeix
@@ -154,13 +154,36 @@ l'efecte.
 La paraula base (`ràpid`) és monomorfèmica, sempre d'una sola peça, i és el
 punt de referència compartit pels desplaçaments de les tres condicions.
 
-Els estats ocults de cada capa demanada es promitgen (*mean-pool*) sobre la
+Els estats ocults de cada capa demanada es promitgen (**promig (*mean-pool*)**) sobre la
 regió de la paraula i es normalitzen L2. L'extracció fa servir
-`dtype=bfloat16`, `device_map="auto"`, sense quantització — emmirallant el
+`dtype=bfloat16`, `device_map="auto"`, sense quantització —emmirallant el
 `02_extract_embeddings.py` de l'estudi coca.
 
 **El "tokenitzador universal" de referència és la segmentació de morfema oracle
 (gold)** — el límit superior morfològicament perfecte.
+
+### Què mesura (i què NO mesura) aquest contrafactual
+
+Cal ser precís sobre l'abast del claim. Quan empalmem `tok(" ràpida") ++
+tok("ment")`, l'embedding de la peça `ment` **no és "el morfema -ment"**: és el
+que la peça BPE `ment` va aprendre distribucionalment de **totes** les paraules
+on apareix (*element*, *moment*, *argument*…). Per tant, la condició morfèmica
+**no aïlla el morfema**; aïlla una **peça de subparaula que coincideix
+ortogràficament** amb el morfema. El que mesurem és, estrictament, *fins a quin
+punt el model recombina de manera composicional peces BPE alineades amb els
+morfemes* — no *que el model codifiqui el morfema -ment com a unitat*. És un
+claim més feble que el que el títol podria suggerir, i el control placebo
+(segmentació aleatòria) és justament el que garanteix que la millora ve de
+l'**alineació** amb els morfemes i no de re-trossejar qualsevol cosa.
+
+Una segona asimetria a tenir present: la base és sempre monomorfèmica i d'una
+sola peça, mentre que el derivat morfèmic és de *k* peces *mean-pooled*. En el
+**delta** `morfèmic − nadiu` la base es cancel·la (apareix idèntica a les dues
+condicions), de manera que el delta compara *derivat morfèmic* (k peces) amb
+*derivat nadiu* (m peces) — totes dues multi-peça; però el **nombre** de peces
+poolejades encara pot diferir entre condicions, i les mètriques *absolutes*
+(§5, usades a la regularitat i al gradient de Sturtevant) sí que comparen un
+vector pooled-de-k amb un pooled-d'1. Vegeu [`limitations.md`](limitations.md).
 
 ### Models de geometria i capes
 

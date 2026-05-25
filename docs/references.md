@@ -70,6 +70,13 @@ sobre regularitat morfològica i arbitrarietat és a
   ACL 2021. [arXiv:2012.15613](https://arxiv.org/abs/2012.15613) — un
   tokenitzador dedicat a la llengua millora el rendiment; motiva el nostre
   control català-aware (Salamandra/ALIA).
+- **Goldman, Caciularu, Eyal, Cao, Szpektor & Tsarfaty (2024).** *Unpacking
+  Tokenization: Evaluating Text Compression and its Correlation with Model
+  Performance.* Findings of ACL 2024.
+  [arXiv:2403.06265](https://arxiv.org/abs/2403.06265) — connecta la
+  fertilitat/compressió amb el **rendiment en tasques**. Important per nosaltres:
+  el nostre estudi és **intrínsec** (geometria), i aquest treball és el pont cap
+  a "i això quant importa en comportament" (vegeu limitacions).
 
 ## 3. Tokenització conscient de la morfologia
 
@@ -102,6 +109,12 @@ sobre regularitat morfològica i arbitrarietat és a
   implementació que fem servir com a **segmentador realista no supervisat**
   (condició `morfessor`), alternativa pràctica al nostre oracle de fronteres
   gold.
+- **Padró & Stanilovsky (2012).** *FreeLing 3.0: Towards Wider Multilinguality.*
+  LREC 2012.
+  [lrec-conf](http://www.lrec-conf.org/proceedings/lrec2012/pdf/430_Paper.pdf)
+  — analitzador morfològic **de regles per al català**. És el segon condicionant
+  "realista" natural (un analitzador desplegable, més fort que Morfessor) que
+  les limitacions assenyalen com a treball futur.
 
 ## 4. Geometria de les representacions i subespais lineals
 
@@ -118,6 +131,13 @@ sobre regularitat morfològica i arbitrarietat és a
   [arXiv:2311.03658](https://arxiv.org/abs/2311.03658) — formalitza quan els
   conceptes són direccions lineals; fonament de mesurar la morfologia com a
   direcció consistent.
+- **Edmiston (2020).** *A Systematic Analysis of Morphological Content in BERT
+  Models for Multiple Languages.*
+  [arXiv:2004.03032](https://arxiv.org/abs/2004.03032) — *probing* directe de si
+  els models de subparaules codifiquen trets morfològics (l'espai d'embeddings
+  es parteix en sub-regions per valor de tret morfològic). És l'antecedent
+  directe de la nostra pregunta que faltava enquadrar: nosaltres ho mirem com a
+  *direcció composicional* en lloc de classificació de trets.
 
 ## 5. Models catalans i multilingües (BSC)
 

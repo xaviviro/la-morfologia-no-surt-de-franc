@@ -174,3 +174,23 @@ def test_bootstrap_diff_ci_positive_when_a_higher():
     b = rng.normal(0.5, 0.05, size=4)
     mean, lo, hi, p = bootstrap_diff_ci(a, b, n=500, seed=1)
     assert mean > 0 and lo < mean < hi
+
+
+def test_sign_test_all_positive():
+    from scripts.geom_lib import sign_test
+    pos, n, p = sign_test([0.1, 0.2, 0.05, 0.3, 0.01, 0.4, 0.02, 0.15, 0.25, 0.08])
+    assert pos == 10 and n == 10
+    assert p < 0.01  # 2*0.5^10 ≈ 0.002
+
+
+def test_sign_test_balanced():
+    from scripts.geom_lib import sign_test
+    pos, n, p = sign_test([1, -1, 1, -1, 1, -1])
+    assert pos == 3 and n == 6 and p == 1.0
+
+
+def test_sign_test_drops_zeros_and_nan():
+    import numpy as np
+    from scripts.geom_lib import sign_test
+    pos, n, p = sign_test([0.0, np.nan, 0.5, 0.5, 0.5])
+    assert pos == 3 and n == 3
