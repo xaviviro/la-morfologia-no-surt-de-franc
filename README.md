@@ -75,6 +75,48 @@ correctes recupera estructura composicional. Vuit resultats:
 
 ---
 
+## Conclusions pràctiques
+
+> ⚠️ L'estudi és **intrínsec** (mesura geometria de l'espai latent), no de
+> rendiment en tasca. El que segueix són **implicacions plausibles** d'aquestes
+> troballes, pendents de validació en una tasca real (vegeu
+> [`docs/limitations.md`](docs/limitations.md)).
+
+1. **El català surt car de tokenitzar, i això té conseqüències de cost.** Una
+   paraula catalana costa ~1,7× més *tokens* que una d'anglesa (fins a ~4× amb
+   l'ela geminada `l·l`). En API de pagament per token, latència i context
+   efectiu, **els usuaris en català paguen més per menys** — el mateix patró
+   d'inequitat que Petrov et al. (2023) i Ahia et al. (2023) documenten entre
+   llengües.
+
+2. **Tria el tokenitzador pensant en la llengua, no només en la mida.** Un
+   vocabulari conscient del català (BSC Salamandra/ALIA) redueix el cost del
+   català ~35% (1,7× → 1,36×). Si despleguies en català, és una palanca directa.
+
+3. **Però "menys *tokens*" no vol dir "millor morfologia".** Cap tokenitzador del
+   panell aïlla bé els morfemes (el sufix `-ment` només ~20% de les vegades);
+   triar un tokenitzador només per fertilitat baixa **no** garanteix
+   representacions morfològicament netes.
+
+4. **Pre-segmentar pels morfemes ajuda, i no cal una eina perfecta.** Forçar el
+   tall morfèmic millora la geometria composicional en tots els models, i un
+   segmentador de **regles** català senzill (o fins i tot Morfessor no
+   supervisat) ja recupera la major part del guany. Per a aplicacions sensibles
+   a la morfologia (flexió, derivació, cerca, normalització), val la pena
+   **provar una pre-segmentació morfèmica** abans de tokenitzar.
+
+5. **Vigila l'ela geminada (`l·l`) en textos tècnics/acadèmics.** És el cas
+   patològic (~4 *tokens* per paraula, i ni els tokenitzadors catalans la
+   comprimeixen): textos amb molt `col·legi`, `cèl·lula`, `paral·lel`… inflen el
+   pressupost de *tokens* de manera desproporcionada.
+
+6. **El fenomen és estable, no una anècdota catalana.** Es replica en castellà
+   (Spearman CA~ES +0,89) i no depèn de la frase de prova (Spearman +0,93): és
+   raonable esperar el mateix patró en altres llengües romàniques/indoeuropees
+   morfològicament riques.
+
+---
+
 ## La fragmentació, en una figura
 
 ![Fertilitat del tokenitzador: català vs anglès](out/figs/fertility_ratio.png)
