@@ -9,3 +9,7 @@ dim_et,derivational,2,"diminutiu -et/-eta: productiu i força transparent, amb m
 agent_dor,derivational,2,"agentiu -dor: derivació productiva i força transparent (X-dor = qui fa X)"
 ment,derivational,3,"adverbial -ment: gramaticalitzat (< llatí MENTE), contribució composicional difusa"
 nom_cio,derivational,3,"nominalitzador -ció: al·lomorfia i lexicalització semàntica forta (educació)"
+pre_des,derivational,2,"prefix des- (reversiu/privatiu): productiu i transparent, poca fusió fonològica"
+pre_re,derivational,2,"prefix re- (repetició): productiu i transparent"
+pre_in,derivational,2,"prefix in-/im- (negació): transparent, amb al·lomorfia in/im davant labials"
+nom_cio_d1,derivational,3,"-ció sobre base ja derivada (-itzar): més profunditat i lexicalització"

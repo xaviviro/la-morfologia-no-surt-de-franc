@@ -32,5 +32,7 @@ def test_lexicon_covers_all_families():
         "ment", "dim_et", "agent_dor", "nom_cio", "plural", "verb_em", "gender_a",
         "ly", "agent_er", "nom_tion", "plural_s",
         "gem_lla", "cedilla", "ny",
+        "pre_des", "pre_re", "pre_in",
+        "verb_reg", "verb_alt", "verb_supl", "nom_cio_d1",
     }
     assert expected <= fams

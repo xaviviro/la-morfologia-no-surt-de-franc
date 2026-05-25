@@ -88,6 +88,20 @@ robust és l'etiqueta objectiva flexiu/derivatiu. La convergència a ~0,60 amb
 tall morfèmic és el resultat sòlid; l'absència de diferència flexió/derivació
 s'ha de llegir com "no hi ha evidència de diferència", no com "són idèntiques".
 
+## Patrons indoeuropeus (findings §11)
+
+- **Gradient de Sturtevant**: les famílies verbals són petites (15 regulars, 15
+  d'alternança, 8 suppletius) i els IC se solapen; el resultat "regular ≳
+  irregular" és una tendència feble, no una prova. Els suppletius i les
+  alternances **no tenen frontera de morfema** neta, així que només s'hi pot
+  llegir la geometria *nadiua*, no un delta morfèmic.
+- **Profunditat**: el contrast és d'un sol sufix (`-ció`) sobre bases d'un sol
+  esquema (`-itzar`); el resultat (d1 > d0) reflecteix que `-ització` és
+  especialment regular, i no s'ha de generalitzar a "més profunditat sempre
+  ajuda".
+- **Prefixos**: `in-/im-` barreja al·lomorfs (`in|útil` vs `im|possible`); la
+  frontera gold segueix la forma de superfície.
+
 ## Encuadre dels models del BSC
 
 La família Salamandra / ALIA del BSC s'inclou com a control català-aware i es

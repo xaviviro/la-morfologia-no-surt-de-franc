@@ -18,6 +18,10 @@ FAMILY_CA = {
     "gender_a": "gènere -a", "ly": "-ly", "agent_er": "agent -er",
     "nom_tion": "nom. -tion", "plural_s": "plural -s",
     "gem_lla": "plural l·l", "cedilla": "plural ç", "ny": "plural ny",
+    "pre_des": "prefix des-", "pre_re": "prefix re-", "pre_in": "prefix in-",
+    "nom_cio_d1": "-ció (base deriv.)",
+    "verb_reg": "verb regular", "verb_alt": "alternança arrel",
+    "verb_supl": "verb supletiu",
 }
 GROUP_ANGLO = "Anglo-dominants"
 GROUP_BSC = "BSC català-aware"

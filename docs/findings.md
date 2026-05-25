@@ -231,35 +231,36 @@ direcció` (Morfessor − nadiu) vs (oracle − nadiu), mitjana famílies CA, IC
 
 | model | oracle − nadiu | Morfessor − nadiu |
 | --- | --- | --- |
-| `gemma-2-2b` | +0,088 [+0,045, +0,136] | +0,080 [+0,040, +0,127] |
-| `gemma-4-E2B` | +0,029 [−0,011, +0,070] | **+0,054 [+0,020, +0,092]** |
-| `Qwen2-1.5B` | +0,026 [−0,032, +0,080] | **+0,047 [+0,012, +0,087]** |
-| `Qwen3.5-4B-Base` | +0,054 [+0,024, +0,089] | +0,051 [+0,022, +0,085] |
-| `salamandra-2b` | +0,181 [+0,127, +0,218] | +0,124 [+0,091, +0,155] |
+| `gemma-2-2b` | +0,108 [+0,059, +0,156] | +0,097 [+0,052, +0,142] |
+| `gemma-4-E2B` | +0,037 [−0,004, +0,077] | **+0,052 [+0,024, +0,081]** |
+| `Qwen2-1.5B` | +0,049 [−0,005, +0,102] | **+0,053 [+0,005, +0,099]** |
+| `Qwen3.5-4B-Base` | +0,071 [+0,032, +0,114] | +0,060 [+0,016, +0,105] |
+| `salamandra-2b` | +0,199 [+0,148, +0,249] | +0,140 [+0,093, +0,190] |
 
 El **delta de Morfessor exclou el zero en els cinc models** — fins i tot a
 `gemma-4-E2B` i `Qwen2-1.5B`, on l'oracle no arribava a la significació. La
 lectura pràctica és forta: **no cal una segmentació morfològicament perfecta**;
 un segmentador no supervisat estàndard ja exposa la major part de l'estructura
 composicional. L'escala de segmentació
-(`out/figs/condition_ladder.png`) ho resumeix: nadiu (0,52) → **aleatori cau a
-0,45** → Morfessor (0,59) ≈ oracle (0,60).
+(`out/figs/condition_ladder.png`) ho resumeix: nadiu (0,55) → **aleatori cau a
+0,50** → Morfessor (0,63) ≈ oracle (0,64).
 
 ## 9. Robustesa entre capes
 
 El guany no depèn de la tria de capa. `Δ (oracle − nadiu)` de consistència de
 direcció (mitjana famílies CA) és **positiu a les tres profunditats escombrades
-en els cinc models** (p. ex. `gemma-2-2b` L6 +0,124 → L15 +0,090 → L22 +0,088;
-`salamandra-2b` L6 +0,221 → L21 +0,181), amb una lleugera disminució en
-profunditat però sense canviar de signe (`out/figs/layer_robustness.png`). Els
+en els cinc models** (p. ex. `gemma-2-2b` L6 +0,115 → L15 +0,087 → L22 +0,108;
+`salamandra-2b` L6 +0,226 → L14 +0,187 → L21 +0,199), sense canviar de signe
+(`out/figs/layer_robustness.png`). Els
 IC i p-valors es calculen ara a totes les capes, no només a la més profunda.
 
 ## 10. Regularitat morfèmica indoeuropea: es manté, però incompleta i uniforme
 
 La teoria morfològica (productivitat de Baayen; flexió > derivació) prediria que
 els morfemes **flexius** són més regulars que els **derivatius** i, per tant,
-geometria més neta. Provem aquesta hipòtesi amb les 10 famílies catalanes,
-etiquetades a priori a `data/family_traits.csv` (vegeu
+geometria més neta. Provem aquesta hipòtesi amb les 14 famílies catalanes amb
+tall morfèmic (incloses prefixos i `-ció` profund), etiquetades a priori a
+`data/family_traits.csv` (vegeu
 [`morphology-background.md`](morphology-background.md) §5).
 
 Consistència de direcció (mitjana sobre models, capa profunda), flexió vs
@@ -267,33 +268,69 @@ derivació, per condició de segmentació:
 
 | condició | global | flexió | derivació | diff (flexió − deriv.) [IC 95 %] |
 | --- | --: | --: | --: | --- |
-| nadiu | 0,52 | 0,497 | 0,559 | −0,062 [−0,182, +0,071] |
-| morfèmic (oracle) | 0,60 | 0,599 | 0,595 | +0,004 [−0,087, +0,097] |
-| Morfessor | 0,59 | 0,578 | 0,615 | −0,037 [−0,136, +0,068] |
+| nadiu | 0,55 | 0,497 | 0,591 | −0,094 [−0,208, +0,019] |
+| morfèmic (oracle) | 0,64 | 0,599 | 0,676 | −0,077 [−0,159, +0,014] |
+| Morfessor | 0,63 | 0,568 | 0,678 | −0,110 [−0,201, −0,016] |
 
-**La hipòtesi no es confirma.** En cap condició la diferència flexió−derivació
-és distingible de zero (tots els IC creuen el zero; el Spearman amb el rang de
-transparència és fins i tot lleugerament *positiu*, el contrari del previst).
-Dues lectures importants i honestes:
+**La hipòtesi no es confirma — i de fet apunta al contrari.** La diferència
+flexió−derivació és nul·la o lleugerament *negativa* (la derivació és igual o
+**més** consistent), i amb Morfessor la diferència ja exclou el zero a favor de
+la derivació; el Spearman amb el rang de transparència és **positiu** (+0,4 a
++0,5), el contrari del que predeia la productivitat. Tres lectures honestes:
 
 1. **La regularitat morfèmica es manté a escala, però és incompleta.** Amb el
-   tall morfèmic correcte la consistència convergeix a **~0,60** a tota la
-   morfologia, no a 1,0. La "desviació per arbitrarietat" (canvi fonètic
-   regular, gramaticalització, lexicalització; §3 del rerefons) és **real i
-   substancial** —rebaixa la regularitat ~40 % respecte al màxim— però es manté
-   en el mateix nivell residual i clarament mesurable.
+   tall morfèmic la consistència convergeix a **~0,64** (no a 1,0). La "desviació
+   per arbitrarietat" (canvi fonètic regular, gramaticalització, lexicalització;
+   §3 del rerefons) és **real i substancial** però residual i clarament
+   mesurable.
 
-2. **La desviació és uniforme, no concentrada en la derivació.** Amb el tall
-   morfèmic, flexió i derivació són pràcticament idèntiques (0,599 vs 0,595). El
-   que separava la flexió en la condició nadiua (0,50 vs 0,56) **no és menys
-   regularitat lingüística sinó més dany de tokenització**: la flexió catalana
-   (afixos curts) es fragmenta de manera que perjudica més la geometria nadiua,
-   i per això és la que més es recupera amb el tall morfèmic (§4). La geometria
-   nadiua barreja morfologia amb tokenització; només el tall morfèmic aïlla la
-   regularitat del morfema.
+2. **La derivació no és menys regular que la flexió; si de cas, ho és més.** En
+   aquests models l'esquema clàssic "flexió més productiva ⇒ més regular" **no
+   es trasllada** a la geometria. La derivació catalana (prefixos i sufixos
+   transparents, `-ització` ultraproductiu) viu en direccions tan netes o més
+   que la flexió.
+
+3. **El que separa la flexió en nadiu és tokenització, no llengua.** La flexió
+   queda enrere en nadiu (0,50 vs 0,59) però no amb el tall morfèmic: els afixos
+   flexius curts es fragmenten de manera que perjudica la geometria nadiua, i
+   per això es recuperen més (§4). La geometria nadiua barreja morfologia amb
+   tokenització; només el tall morfèmic aïlla la regularitat del morfema.
 
 Vegeu `out/figs/regularity.png`, `out/regularity_analysis.csv` i
 `out/regularity_summary.csv`.
+
+## 11. Patrons indoeuropeus: prefixació, gradient de Sturtevant, profunditat
+
+Tres patrons motivats per la morfologia IE
+([`morphology-background.md`](morphology-background.md)), tots a la capa més
+profunda amb IC 95 % per bootstrap:
+
+**A · Prefixació (el buit estructural).** Tot l'estudi era sufixal; afegim
+prefixos (`des-`, `re-`, `in-/im-`). El seu Δ morfèmic de consistència de
+direcció és **+0,198**, enorme i molt superior al dels sufixos derivatius
+(+0,036): diff **+0,162 [+0,107, +0,212], p = 0,001**. És el delta més gran de
+tot l'estudi — els prefixos catalans són els que la tokenització nadiua
+fragmenta de manera més perjudicial, i els que més recupera el tall morfèmic.
+
+**B/C · Gradient de Sturtevant (regular vs irregular).** La predicció
+neogramàtica era que la consistència de direcció **decaigués** regular →
+alternança d'arrel → suppletiu (verbs, present 1a sg). El resultat és **feble i
+no monòton**: verb regular 0,554 [0,495, 0,609] > suppletiu 0,517 [0,454, 0,586]
+> alternança 0,498 [0,461, 0,532]. Hi ha una *tendència* que els regulars siguin
+més consistents que els irregulars, coherent amb Sturtevant, però els IC se
+solapen i el suppletiu no segueix el gradient — amb n petita (8–15 verbs) **no
+es pot afirmar un gradient net** (`out/figs/sturtevant_gradient.png`).
+
+**D · Profunditat derivativa (FALSADOR).** La predicció era que `-ció` perdés
+consistència quan la base ja és derivada. **Surt el contrari**: `-ció` sobre
+base derivada (`globalitzar→globalització`, d1 = 0,831) és **més** consistent
+que sobre base simple (`crear→creació`, d0 = 0,694): diff **−0,137 [−0,215,
+−0,064], p = 0,001**. La profunditat no degrada la composicionalitat; el que
+mana és la **regularitat del patró**, i `-ització` és extraordinàriament
+sistemàtic i productiu. Una capa morfològica de més no és soroll si el patró és
+regular.
+
+Artefactes: `out/ie_sturtevant_gradient.csv`, `out/ie_patterns_summary.csv`.
 
 ---
 

@@ -9,8 +9,20 @@ from scripts.m06_figs import (
     fig_morfessor_agreement,
     fig_placebo,
     fig_regularity,
+    fig_sturtevant,
     fig_tokenization_examples,
 )
+
+
+def test_fig_sturtevant_writes_png(tmp_path):
+    grad = pd.DataFrame({
+        "level": ["verb_reg", "verb_alt", "verb_supl"],
+        "native_consistency": [0.62, 0.52, 0.42],
+        "ci_lo": [0.55, 0.45, 0.34], "ci_hi": [0.69, 0.59, 0.50], "n": [15, 15, 7],
+    })
+    p = tmp_path / "stur.png"
+    fig_sturtevant(grad, p)
+    assert p.exists() and p.stat().st_size > 0
 
 
 def test_fig_regularity_writes_png(tmp_path):

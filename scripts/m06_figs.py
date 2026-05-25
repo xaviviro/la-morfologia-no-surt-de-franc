@@ -164,7 +164,8 @@ def fig_delta_heatmap(metrics: pd.DataFrame, metric: str, path: Path) -> None:
         rows.append(d[(d.model == model) & (d.layer == L)])
     d = pd.concat(rows, ignore_index=True) if rows else d
     ca_order = ["ment", "dim_et", "agent_dor", "nom_cio", "plural", "verb_em", "gender_a",
-                "gem_lla", "cedilla", "ny"]
+                "gem_lla", "cedilla", "ny",
+                "pre_des", "pre_re", "pre_in", "nom_cio_d1"]
     en_order = ["ly", "agent_er", "nom_tion", "plural_s"]
 
     def _piv(col):
@@ -431,6 +432,28 @@ def fig_regularity(analysis: pd.DataFrame, path: Path) -> None:
     plt.close()
 
 
+def fig_sturtevant(grad: pd.DataFrame, path: Path) -> None:
+    """Gradient de Sturtevant: consistència de direcció nadiua decau
+    regular → alternança d'arrel → supletiu (amb IC 95%)."""
+    order = ["verb_reg", "verb_alt", "verb_supl"]
+    g = grad.set_index("level").reindex([x for x in order if x in set(grad.level)])
+    x = np.arange(len(g))
+    means = g["native_consistency"].to_numpy()
+    err = np.vstack([means - g["ci_lo"].to_numpy(), g["ci_hi"].to_numpy() - means])
+    fig, ax = plt.subplots(figsize=(8, 5.5))
+    ax.bar(x, means, yerr=err, capsize=5,
+           color=["#1b9e77", "#d9a02f", "#d95f02"][: len(g)])
+    ax.set_xticks(x, [fam_label(i) for i in g.index])
+    ax.set_ylabel("consistència de direcció (nadiua)")
+    ax.set_ylim(0, max(0.7, float(np.nanmax(g["ci_hi"])) + 0.05))
+    ax.set_title("Gradient de Sturtevant (verbs, present 1a sg): regular vs irregular\n"
+                 "tendència feble regular > irregular, però IC solapats (n petita)")
+    plt.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+
 def main() -> None:
     from transformers import AutoTokenizer
 
@@ -460,6 +483,10 @@ def main() -> None:
     reg_path = ROOT / "out" / "regularity_analysis.csv"
     if reg_path.exists():
         fig_regularity(pd.read_csv(reg_path), FIGS / "regularity.png")
+
+    grad_path = ROOT / "out" / "ie_sturtevant_gradient.csv"
+    if grad_path.exists():
+        fig_sturtevant(pd.read_csv(grad_path), FIGS / "sturtevant_gradient.png")
 
     examples = [
         ("ràpidament", "ràpida|ment"),

@@ -16,7 +16,7 @@ protagonista.
 
 Hem mesurat com els tokenitzadors dels grans models de llenguatge tallen la
 morfologia catalana, i hem provat si imposar les fronteres morfèmiques
-correctes recupera estructura composicional. Cinc resultats:
+correctes recupera estructura composicional. Set resultats:
 
 1. **El català es fragmenta molt més que l'anglès.** Als models
    anglo-dominants (Gemma, Qwen, Mistral) una paraula catalana costa **~1,7×**
@@ -50,11 +50,17 @@ correctes recupera estructura composicional. Cinc resultats:
    morfemes.
 
 6. **La regularitat morfèmica indoeuropea es manté a escala, però incompleta.**
-   Amb el tall morfèmic correcte, la composicionalitat convergeix a ~0,60 (no a
-   1,0) de manera **uniforme** entre flexió i derivació: la desviació per
-   arbitrarietat històrica és real però compartida, no concentrada en cap tipus.
-   La hipòtesi clàssica "flexió més regular que derivació" **no es confirma**
-   geomètricament (vegeu [`docs/morphology-background.md`](docs/morphology-background.md)).
+   Amb el tall morfèmic correcte, la composicionalitat convergeix a ~0,64 (no a
+   1,0): la desviació per arbitrarietat històrica és real i mesurable. La
+   hipòtesi clàssica "flexió més regular que derivació" **no es confirma**
+   geomètricament (si de cas, la derivació és igual o més regular; vegeu
+   [`docs/morphology-background.md`](docs/morphology-background.md)).
+
+7. **Patrons indoeuropeus (prefixació, Sturtevant, profunditat).** Els
+   **prefixos** són els que més guanyen amb el tall morfèmic (delta +0,198, el
+   més gran de l'estudi); el **gradient de Sturtevant** regular→irregular és una
+   tendència feble sense gradient net; i la **profunditat derivativa** és un
+   falsador — `-ció` sobre base derivada és *més* regular, no menys.
 
 > Els models del BSC (Salamandra / ALIA) s'inclouen com a control
 > *català-aware* i es descriuen de manera neutra al llarg de tot l'estudi.
@@ -141,12 +147,24 @@ models, no és un artefacte de triar una capa concreta.
 
 ![Regularitat: flexió vs derivació](out/figs/regularity.png)
 
-Amb el tall morfèmic, flexió i derivació convergeixen a **~0,60** (no a l'1,0
+Amb el tall morfèmic, la consistència convergeix a **~0,64** (no a l'1,0
 perfecte): la regularitat morfèmica **es manté i és mesurable**, però la
 desviació per arbitrarietat històrica (canvi fonètic, gramaticalització,
-lexicalització) és real i **uniforme** entre tipus. La hipòtesi "flexió més
-regular que derivació" no es confirma. Fons teòric a
+lexicalització) és real. La hipòtesi "flexió més regular que derivació" **no es
+confirma** (si de cas, la derivació és igual o més regular). Fons teòric a
 [`docs/morphology-background.md`](docs/morphology-background.md).
+
+### Patrons indoeuropeus: prefixació i gradient de Sturtevant
+
+![Gradient de Sturtevant](out/figs/sturtevant_gradient.png)
+
+Tres patrons motivats per la morfologia IE (findings §11): **(A)** els
+**prefixos** (`des-`, `re-`, `in-`) tenen el delta morfèmic més gran de tot
+l'estudi (+0,198, p=0,001) — omplir el buit sufixal era important; **(B/C)** el
+**gradient de Sturtevant** (regular → irregular) és una tendència feble amb IC
+solapats, sense gradient net; **(D)** la **profunditat derivativa** és un
+falsador: `-ció` sobre base derivada (`globalització`) és *més* regular, no
+menys — mana la regularitat del patró, no la profunditat.
 
 ### El sufix protagonista: `-ment`
 

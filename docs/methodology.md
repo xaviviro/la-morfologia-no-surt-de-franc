@@ -40,8 +40,8 @@ morfologia en lloc d'una de col·lisió cultural.
 
 ## 2. El lèxic
 
-Un lèxic curat a mà (`data/morph_pairs.csv`, 356 parells (base, derivat),
-llicència CC-BY) amb **fronteres de morfema oracle**, revisat per l'autor pel
+Un lèxic curat a mà (`data/morph_pairs.csv`, 441 parells (base, derivat) en 21
+famílies, llicència CC-BY) amb **fronteres de morfema oracle**, revisat per l'autor pel
 que fa a la correcció catalana (accents, la regla del femení per a `-ment`,
 formes irregulars). Cada fila: `lang, family, base, derived,
 gold_segmentation` (morfemes separats per barra), `morph_type, carrier`.
@@ -58,6 +58,9 @@ gold_segmentation` (morfemes separats per barra), `morph_type, carrier`.
 | ca | `gem_lla` | 12 | plural amb **ela geminada** `l·l` (`col·legi → col·legis`) |
 | ca | `cedilla` | 13 | plural amb **ç** (`plaça → places`, `feliç → feliços`) |
 | ca | `ny` | 12 | plural amb el **dígraf ny** (`muntanya → muntanyes`) |
+| ca | `pre_des` / `pre_re` / `pre_in` | 12 ×3 | **prefixació** (`des-`, `re-`, `in-/im-`) — l'estudi era altrament tot sufixal |
+| ca | `verb_reg` / `verb_alt` / `verb_supl` | 15/15/8 | **gradient de Sturtevant** verbal (1a sg present): regular → alternança d'arrel → suppletiu |
+| ca | `nom_cio_d1` | 12 | `-ció` sobre **base ja derivada** (`globalitzar→globalització`) — profunditat derivativa |
 | en | `ly` | 40 | adverbi `-ly` (paral·lel a `-ment`) |
 | en | `agent_er` | 25 | agentiu `-er` |
 | en | `nom_tion` | 25 | nominalitzador `-tion`/`-ation` |
@@ -66,6 +69,13 @@ gold_segmentation` (morfemes separats per barra), `morph_type, carrier`.
 `-ment` és el protagonista. Les famílies angleses són un *baseline* paral·lel:
 permeten preguntar si un tokenitzador anglo-dominant representa la morfologia
 anglesa de manera més composicional que la catalana.
+
+**Nota ortogràfica (`ser → sóc`).** Mantenim la forma tradicional accentuada
+`sóc`. La reforma de l'IEC (2016) escriu `soc` (sense l'accent diacrític);
+conservem `sóc` perquè continua sent molt habitual i perquè `soc` col·lideix amb
+el substantiu *soc* (esclop / mercat). Com que l'accent **canvia la seqüència de
+tokens**, la decisió es documenta explícitament aquí i al codi
+(`scripts/m01_build_lexicon.py`).
 
 Una única **frase portadora** metalingüística posa cada paraula en una
 posició sintàctica uniforme independentment de la categoria gramatical —

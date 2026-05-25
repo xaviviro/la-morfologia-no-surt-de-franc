@@ -1,14 +1,22 @@
 family,consistency,n_models,morph_type,transparency_rank,rationale,condition
+nom_cio_d1,0.8829160655665043,5,derivational,3,-ció sobre base ja derivada (-itzar): més profunditat i lexicalització,native
 nom_cio,0.7126626742225268,5,derivational,3,nominalitzador -ció: al·lomorfia i lexicalització semàntica forta (educació),native
 verb_em,0.6150548786758707,5,inflectional,1,flexió verbal regular (1a pl. present -em),native
 agent_dor,0.6045713755056606,5,derivational,2,agentiu -dor: derivació productiva i força transparent (X-dor = qui fa X),native
+pre_des,0.5959628345129807,5,derivational,2,"prefix des- (reversiu/privatiu): productiu i transparent, poca fusió fonològica",native
+pre_re,0.5392775442092608,5,derivational,2,prefix re- (repetició): productiu i transparent,native
 ment,0.5341034141603411,5,derivational,3,"adverbial -ment: gramaticalitzat (< llatí MENTE), contribució composicional difusa",native
 gem_lla,0.49554753879454194,5,inflectional,1,"plural regular; la complicació és ortogràfica (l·l), no morfològica",native
 cedilla,0.4769360935274401,5,inflectional,1,"plural regular; la complicació és ortogràfica (ç), no morfològica",native
 plural,0.47237368872226193,5,inflectional,1,flexió nominal altament productiva i regular (-s/-os),native
+pre_in,0.471299488173916,5,derivational,2,"prefix in-/im- (negació): transparent, amb al·lomorfia in/im davant labials",native
 ny,0.4690138102099926,5,inflectional,1,plural regular; la complicació és ortogràfica (dígraf ny),native
 gender_a,0.4516505438251457,5,inflectional,1,flexió de gènere productiva i regular (-a),native
 dim_et,0.38429036609555817,5,derivational,2,"diminutiu -et/-eta: productiu i força transparent, amb matís afectiu",native
+nom_cio_d1,0.8314776012904893,5,derivational,3,-ció sobre base ja derivada (-itzar): més profunditat i lexicalització,morphemic
+pre_des,0.7651612786544939,5,derivational,2,"prefix des- (reversiu/privatiu): productiu i transparent, poca fusió fonològica",morphemic
+pre_re,0.7313008616238521,5,derivational,2,prefix re- (repetició): productiu i transparent,morphemic
+pre_in,0.7025962695692758,5,derivational,2,"prefix in-/im- (negació): transparent, amb al·lomorfia in/im davant labials",morphemic
 nom_cio,0.6941369770091389,5,derivational,3,nominalitzador -ció: al·lomorfia i lexicalització semàntica forta (educació),morphemic
 verb_em,0.6923879479181889,5,inflectional,1,flexió verbal regular (1a pl. present -em),morphemic
 plural,0.653940063691522,5,inflectional,1,flexió nominal altament productiva i regular (-s/-os),morphemic
@@ -19,13 +27,17 @@ ment,0.5731704343544,5,derivational,3,"adverbial -ment: gramaticalitzat (< llat�
 ny,0.5508944124814089,5,inflectional,1,plural regular; la complicació és ortogràfica (dígraf ny),morphemic
 cedilla,0.49796263494163073,5,inflectional,1,"plural regular; la complicació és ortogràfica (ç), no morfològica",morphemic
 dim_et,0.48132432838634676,5,derivational,2,"diminutiu -et/-eta: productiu i força transparent, amb matís afectiu",morphemic
-nom_cio,0.7353064896229335,5,derivational,3,nominalitzador -ció: al·lomorfia i lexicalització semàntica forta (educació),morfessor
-verb_em,0.6701186207331007,5,inflectional,1,flexió verbal regular (1a pl. present -em),morfessor
-plural,0.6512583049384444,5,inflectional,1,flexió nominal altament productiva i regular (-s/-os),morfessor
-agent_dor,0.6444483277389501,5,derivational,2,agentiu -dor: derivació productiva i força transparent (X-dor = qui fa X),morfessor
-ment,0.5879147567558605,5,derivational,3,"adverbial -ment: gramaticalitzat (< llatí MENTE), contribució composicional difusa",morfessor
-gender_a,0.575935391485613,5,inflectional,1,flexió de gènere productiva i regular (-a),morfessor
-ny,0.5522675149037447,5,inflectional,1,plural regular; la complicació és ortogràfica (dígraf ny),morfessor
+nom_cio_d1,0.8884777690299268,5,derivational,3,-ció sobre base ja derivada (-itzar): més profunditat i lexicalització,morfessor
+pre_des,0.753108475045724,5,derivational,2,"prefix des- (reversiu/privatiu): productiu i transparent, poca fusió fonològica",morfessor
+pre_re,0.7259681378294645,5,derivational,2,prefix re- (repetició): productiu i transparent,morfessor
+nom_cio,0.7248547383711365,5,derivational,3,nominalitzador -ció: al·lomorfia i lexicalització semàntica forta (educació),morfessor
+pre_in,0.7025962695692758,5,derivational,2,"prefix in-/im- (negació): transparent, amb al·lomorfia in/im davant labials",morfessor
+verb_em,0.6604803054826223,5,inflectional,1,flexió verbal regular (1a pl. present -em),morfessor
+plural,0.6293357832207422,5,inflectional,1,flexió nominal altament productiva i regular (-s/-os),morfessor
+ment,0.5900734416233002,5,derivational,3,"adverbial -ment: gramaticalitzat (< llatí MENTE), contribució composicional difusa",morfessor
+agent_dor,0.5602165978514979,5,derivational,2,agentiu -dor: derivació productiva i força transparent (X-dor = qui fa X),morfessor
+gender_a,0.5499290153433632,5,inflectional,1,flexió de gènere productiva i regular (-a),morfessor
+ny,0.5483617775020612,5,inflectional,1,plural regular; la complicació és ortogràfica (dígraf ny),morfessor
 gem_lla,0.5151130416970812,5,inflectional,1,"plural regular; la complicació és ortogràfica (l·l), no morfològica",morfessor
 cedilla,0.5032089066922332,5,inflectional,1,"plural regular; la complicació és ortogràfica (ç), no morfològica",morfessor
-dim_et,0.4919705735128009,5,derivational,2,"diminutiu -et/-eta: productiu i força transparent, amb matís afectiu",morfessor
+dim_et,0.47749724396770654,5,derivational,2,"diminutiu -et/-eta: productiu i força transparent, amb matís afectiu",morfessor

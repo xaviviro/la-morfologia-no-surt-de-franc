@@ -41,7 +41,11 @@ GEOMETRY_MODELS = {
     "BSC-LT/salamandra-2b": [6, 14, 21],
 }
 CA_FAMILIES = ["ment", "dim_et", "agent_dor", "nom_cio", "plural", "verb_em",
-               "gender_a", "gem_lla", "cedilla", "ny"]
+               "gender_a", "gem_lla", "cedilla", "ny",
+               "pre_des", "pre_re", "pre_in", "nom_cio_d1"]
+# Verb regularity families (Sturtevant gradient) are analysed separately in m08;
+# alt/supl have no clean morpheme cut so their delta is not meaningful.
+VERB_GRADIENT = ["verb_reg", "verb_alt", "verb_supl"]
 # delta name -> (minuend condition, reference condition)
 DELTAS = {
     "delta": ("morphemic", "native"),            # oracle vs native

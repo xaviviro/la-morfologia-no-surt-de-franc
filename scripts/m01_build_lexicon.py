@@ -20,6 +20,10 @@ FAMILY_SUFFIX = {
     "ly": "ly", "agent_er": "er", "nom_tion": "tion", "plural_s": "s",
     # Catalan-specific orthography (plural morphology, feature in the stem):
     "gem_lla": None, "cedilla": None, "ny": None,
+    # IE-motivated patterns: prefixation, Sturtevant regularity gradient, depth:
+    "pre_des": None, "pre_re": None, "pre_in": None,
+    "verb_reg": None, "verb_alt": None, "verb_supl": None,
+    "nom_cio_d1": "ció",
 }
 
 
@@ -446,10 +450,131 @@ NY = _ca("ny", "inflectional", [
     ("cabanya", "cabanyes", "cabany|es"),
 ])
 
+# --- IE pattern A: prefixation (the study is otherwise all-suffixal) ----------
+PRE_DES = _ca("pre_des", "derivational", [
+    ("fer", "desfer", "des|fer"),
+    ("muntar", "desmuntar", "des|muntar"),
+    ("lligar", "deslligar", "des|lligar"),
+    ("ordenar", "desordenar", "des|ordenar"),
+    ("tapar", "destapar", "des|tapar"),
+    ("congelar", "descongelar", "des|congelar"),
+    ("connectar", "desconnectar", "des|connectar"),
+    ("activar", "desactivar", "des|activar"),
+    ("carregar", "descarregar", "des|carregar"),
+    ("muntatge", "desmuntatge", "des|muntatge"),
+    ("avantatge", "desavantatge", "des|avantatge"),
+    ("acord", "desacord", "des|acord"),
+])
+
+PRE_RE = _ca("pre_re", "derivational", [
+    ("fer", "refer", "re|fer"),
+    ("llegir", "rellegir", "re|llegir"),
+    ("escriure", "reescriure", "re|escriure"),
+    ("començar", "recomençar", "re|començar"),
+    ("omplir", "reomplir", "re|omplir"),
+    ("considerar", "reconsiderar", "re|considerar"),
+    ("organitzar", "reorganitzar", "re|organitzar"),
+    ("construir", "reconstruir", "re|construir"),
+    ("col·locar", "recol·locar", "re|col·locar"),
+    ("aparèixer", "reaparèixer", "re|aparèixer"),
+    ("plantejar", "replantejar", "re|plantejar"),
+    ("definir", "redefinir", "re|definir"),
+])
+
+PRE_IN = _ca("pre_in", "derivational", [
+    ("útil", "inútil", "in|útil"),
+    ("just", "injust", "in|just"),
+    ("complet", "incomplet", "in|complet"),
+    ("correcte", "incorrecte", "in|correcte"),
+    ("possible", "impossible", "im|possible"),
+    ("mortal", "immortal", "im|mortal"),
+    ("visible", "invisible", "in|visible"),
+    ("capaç", "incapaç", "in|capaç"),
+    ("necessari", "innecessari", "in|necessari"),
+    ("segur", "insegur", "in|segur"),
+    ("actiu", "inactiu", "in|actiu"),
+    ("oportú", "inoportú", "in|oportú"),
+])
+
+# --- IE pattern B/C: Sturtevant regularity gradient (verbs, 1sg present) -------
+#     regular (stem intact) -> stem alternation (ablaut/velar) -> suppletive.
+#     The alternating/suppletive forms have no clean morpheme cut, so their gold
+#     is the whole word (oracle == native); the test of interest is the *native*
+#     direction consistency, which should decay along the gradient.
+VERB_REG = _ca("verb_reg", "inflectional", [
+    ("cantar", "canto", "cant|o"),
+    ("parlar", "parlo", "parl|o"),
+    ("mirar", "miro", "mir|o"),
+    ("comprar", "compro", "compr|o"),
+    ("treballar", "treballo", "treball|o"),
+    ("estudiar", "estudio", "estudi|o"),
+    ("escoltar", "escolto", "escolt|o"),
+    ("ballar", "ballo", "ball|o"),
+    ("nedar", "nedo", "ned|o"),
+    ("caminar", "camino", "camin|o"),
+    ("cuinar", "cuino", "cuin|o"),
+    ("saltar", "salto", "salt|o"),
+    ("entrar", "entro", "entr|o"),
+    ("portar", "porto", "port|o"),
+    ("ajudar", "ajudo", "ajud|o"),
+])
+
+VERB_ALT = _ca("verb_alt", "inflectional", [
+    ("poder", "puc", "puc"),
+    ("voler", "vull", "vull"),
+    ("tenir", "tinc", "tinc"),
+    ("venir", "vinc", "vinc"),
+    ("dir", "dic", "dic"),
+    ("dur", "duc", "duc"),
+    ("beure", "bec", "bec"),
+    ("caure", "caic", "caic"),
+    ("creure", "crec", "crec"),
+    ("viure", "visc", "visc"),
+    ("prendre", "prenc", "prenc"),
+    ("escriure", "escric", "escric"),
+    ("collir", "cullo", "cullo"),
+    ("cosir", "cuso", "cuso"),
+    ("sortir", "surto", "surto"),
+])
+
+VERB_SUPL = _ca("verb_supl", "inflectional", [
+    # Orthography note: we keep the traditional accented "sóc". The 2016 IEC
+    # reform writes it "soc" (the diacritic was dropped). We retain "sóc"
+    # because it remains widespread and because "soc" collides with the noun
+    # "soc" (clog/market); since the accent changes the token sequence, the
+    # choice is recorded explicitly here and in docs/methodology.md §2.
+    ("ser", "sóc", "sóc"),
+    ("anar", "vaig", "vaig"),
+    ("fer", "faig", "faig"),
+    ("estar", "estic", "estic"),
+    ("haver", "he", "he"),
+    ("saber", "sé", "sé"),
+    ("veure", "veig", "veig"),
+])
+
+# --- IE pattern D: derivational depth (same -ció suffix on a derived base) -----
+NOM_CIO_D1 = _ca("nom_cio_d1", "derivational", [
+    ("realitzar", "realització", "realitza|ció"),
+    ("globalitzar", "globalització", "globalitza|ció"),
+    ("organitzar", "organització", "organitza|ció"),
+    ("modernitzar", "modernització", "modernitza|ció"),
+    ("nacionalitzar", "nacionalització", "nacionalitza|ció"),
+    ("privatitzar", "privatització", "privatitza|ció"),
+    ("actualitzar", "actualització", "actualitza|ció"),
+    ("legalitzar", "legalització", "legalitza|ció"),
+    ("normalitzar", "normalització", "normalitza|ció"),
+    ("centralitzar", "centralització", "centralitza|ció"),
+    ("automatitzar", "automatització", "automatitza|ció"),
+    ("digitalitzar", "digitalització", "digitalitza|ció"),
+])
+
 LEXICON: list[Entry] = (
     MENT + DIM_ET + AGENT_DOR + NOM_CIO + PLURAL + VERB_EM + GENDER_A
     + LY + AGENT_ER + NOM_TION + PLURAL_S
     + GEM_LLA + CEDILLA + NY
+    + PRE_DES + PRE_RE + PRE_IN
+    + VERB_REG + VERB_ALT + VERB_SUPL
+    + NOM_CIO_D1
 )
 
 
