@@ -342,12 +342,14 @@ uv run python scripts/m06_figs.py
 Codi: MIT. El lèxic curat a mà (`data/morph_pairs.csv`) és CC-BY 4.0 —
 citeu-lo si el reutilitzeu.
 
-## Autor
+## Autors
 
 Xavier Vinaixa Roselló — Sorensen AI ([sorensen.ai](https://sorensen.ai)),
 Barcelona · [ORCID 0009-0005-2769-9215](https://orcid.org/0009-0005-2769-9215)
 · [github.com/xaviviro](https://github.com/xaviviro) ·
 [xavi@sorensen.ai](mailto:xavi@sorensen.ai)
+
+Marçal Font Espí
 
 ## Citació
 
@@ -355,7 +357,7 @@ Barcelona · [ORCID 0009-0005-2769-9215](https://orcid.org/0009-0005-2769-9215)
 @misc{vinaixa2026morfologia,
   title        = {La morfologia no surt de franc: com la tokenitzaci\'o en
                   subparaules fractura la morfologia catalana},
-  author       = {Vinaixa Rosell\'o, Xavier},
+  author       = {Vinaixa Rosell\'o, Xavier and Font Esp\'i, Mar\c{c}al},
   year         = {2026},
   institution  = {Sorensen AI, Barcelona},
   note         = {ORCID: 0009-0005-2769-9215},

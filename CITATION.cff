@@ -11,6 +11,8 @@ authors:
     orcid: "https://orcid.org/0009-0005-2769-9215"
     affiliation: "Sorensen AI (sorensen.ai), Barcelona, Catalonia"
     website: "https://sorensen.ai"
+  - family-names: Font Espí
+    given-names: Marçal
 repository-code: "https://github.com/xaviviro/la-morfologia-no-surt-de-franc"
 url: "https://github.com/xaviviro/la-morfologia-no-surt-de-franc"
 abstract: >-
@@ -55,6 +57,8 @@ preferred-citation:
       email: xavi@sorensen.ai
       affiliation: "Sorensen AI (sorensen.ai), Barcelona, Catalonia"
       website: "https://sorensen.ai"
+    - family-names: Font Espí
+      given-names: Marçal
   title: >-
     La morfologia no surt de franc: com la tokenització en subparaules
     fractura la morfologia catalana
