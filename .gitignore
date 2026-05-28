@@ -9,3 +9,11 @@ out/*.csv
 # keep committed figures and the audit/metrics summaries:
 !out/figs/
 !out/figs/**
+# Part 2: keep scripts, figures and result CSVs; ignore large/regenerable artifacts
+part2/out/**/*.npy
+part2/out/*/model*.safetensors
+part2/out/*/pytorch_model*.bin
+part2/out/*/*.json
+part2/out/**/train_log.csv
+part2/out/nohup*.out
+part2/out/*.log

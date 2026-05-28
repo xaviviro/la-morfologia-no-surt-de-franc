@@ -75,8 +75,10 @@ correctes recupera estructura composicional. Nou resultats:
    tokenització nadiua (parells mínims, 90%), i un *probe* lineal ja decodifica
    nombre/gènere (~0,9). **Forçar** la segmentació morfèmica a un model ja
    entrenat **empitjora** el comportament (la seqüència li és desconeguda). El
-   benefici és **intern**; capturar-lo en comportament demana un *full
-   fine-tuning* amb el tokenitzador morfèmic — la **Part 2** d'aquest estudi.
+   benefici és **intern**. La **Part 2** ho posa a prova reentrenant amb el
+   tokenitzador morfèmic: el reentrenament **baixa la perplexitat als 4 models
+   però no millora el comportament** (parells mínims) en cap —una dissociació
+   neta.
 
 > Els models del BSC (Salamandra / ALIA) s'inclouen com a control
 > conscient del català i es descriuen de manera neutra al llarg de tot l'estudi.
@@ -86,10 +88,11 @@ correctes recupera estructura composicional. Nou resultats:
 ## Conclusions pràctiques
 
 > ⚠️ L'estudi és **principalment intrínsec** (mesura geometria de l'espai
-> latent). La validació en tasca (findings §14) matisa el punt 4: el benefici de
-> la segmentació morfèmica és **intern** i **no es trasllada a comportament sense
-> reentrenar**. La resta de punts són **implicacions plausibles** (vegeu
-> [`docs/limitations.md`](docs/limitations.md)).
+> latent). La validació en tasca (findings §14) i la **Part 2** matisen el punt 4:
+> el benefici de la segmentació morfèmica és **intern** i **no es trasllada a
+> comportament, ni tan sols reentrenant** (la perplexitat baixa, la precisió en
+> parells mínims no puja). La resta de punts són **implicacions plausibles**
+> (vegeu [`docs/limitations.md`](docs/limitations.md)).
 
 1. **El català surt car de tokenitzar, i això té conseqüències de cost.** Una
    paraula catalana costa ~1,7× més *tokens* que una d'anglesa (fins a ~4× amb
@@ -110,12 +113,13 @@ correctes recupera estructura composicional. Nou resultats:
 4. **Pre-segmentar pels morfemes neteja la geometria, però NO n'hi ha prou
    sense reentrenar.** Forçar el tall morfèmic millora la geometria composicional
    en tots els models (i un segmentador de **regles** català, recall 0,78, ja
-   iguala l'oracle). **Però** la validació en tasca mostra que *afegir* aquesta
-   segmentació a un model ja entrenat **empitjora** el comportament en
-   log-probabilitat (la seqüència d'ids li resulta desconeguda): el benefici
-   només es pot capturar **reentrenant** el model amb el tokenitzador morfèmic
-   (la "Part 2" d'aquest estudi). La lliçó pràctica: la consciència morfèmica és
-   una propietat del *pipeline d'entrenament*, no un pegat d'inferència.
+   iguala l'oracle). **Però** *afegir* aquesta segmentació a un model ja entrenat
+   **empitjora** el comportament en log-probabilitat (la seqüència d'ids li
+   resulta desconeguda), i —troballa clau de **Part 2**— **reentrenar amb el
+   tokenitzador morfèmic tampoc no millora el comportament**: baixa la
+   perplexitat als 4 models, però la precisió en parells mínims no puja en cap.
+   El guany morfèmic es queda en geometria i regularitat, no en comportament
+   gramatical.
 
 5. **Vigila l'ela geminada (`l·l`) en textos tècnics/acadèmics.** És el cas
    patològic (~4 *tokens* per paraula, i ni els tokenitzadors catalans la
@@ -226,8 +230,9 @@ Amb tokenització **nadiua** els models ja prefereixen la forma morfològicament
 correcta (parells mínims, 90% de precisió). Però **forçar** la segmentació
 morfèmica per empalmament d'ids **enfonsa** la precisió (a 0,18): la seqüència
 resultant és *out-of-distribution* per a un model que no s'hi va entrenar. El
-benefici de la segmentació morfèmica és, doncs, **intern** (geometria) i només es
-podrà capturar en comportament **reentrenant** (Part 2).
+benefici de la segmentació morfèmica és, doncs, **intern** (geometria); la
+**Part 2** (més avall) prova si reentrenar el captura en comportament —i troba que
+**no**: la perplexitat baixa però la precisió en parells mínims no millora.
 
 ### Es manté la regularitat del morfema indoeuropeu a escala?
 
@@ -260,6 +265,82 @@ Gris = tokenització nadiua, verd = segmentació morfèmica oracle. La
 re-segmentació millora la consistència de direcció en 4 de 5 models i
 l'analogia en 4 de 5; el guany més espectacular és l'analogia de
 Salamandra-2B (0,625 → 0,950).
+
+---
+
+## Part 2 — reentrenament: el guany és de perplexitat, no de comportament
+
+Part 1 deixa una pregunta oberta. El benefici de la segmentació morfèmica és
+**intern** (geometria); imposar-lo per empalmament d'ids sobre un model que no
+s'hi va entrenar **enfonsa** el comportament (parells mínims 0,90 → 0,18,
+*out-of-distribution*). **Part 2** posa a prova la hipòtesi forta: si
+**reentrenem** amb segmentació morfèmica, el guany geomètric es converteix en
+guany de comportament?
+
+**Disseny.** *Continued-pretraining* controlat A/B sobre **25M tokens** del corpus
+català `projecte-aina/CATalog`: **4 models** del panell × **3 llavors** (42/43/44)
+× 2 condicions = **24 entrenaments**. **A** = tokenització nadiua (control); **B** =
+segmentació morfèmica per regles (`scripts/rule_seg.py`), empalmada amb el mateix
+vocabulari. A i B són idèntics en tota la resta (corpus, passos, *learning rate*,
+llavor); l'única variable és la segmentació. (`gemma-4-E2B` queda exclòs: és
+numèricament inestable amb els optimitzadors disponibles en bf16 —error de
+*kernel* amb bitsandbytes i divergència silenciosa amb Adafactor.)
+
+![Dissociació perplexitat vs comportament](part2/out/figs/part2_dissociacio.png)
+
+### Perplexitat: B guanya, als 4 models
+
+| model | A nadiu | B morfèmic | Δ (B − A) |
+| --- | ---: | ---: | ---: |
+| gemma-2-2b | 9,58 | 8,56 | **−1,02** |
+| Qwen2-1.5B | 11,93 | 9,74 | **−2,19** |
+| Qwen3.5-4B | 8,72 | 7,78 | **−0,94** |
+| salamandra-2b | 11,14 | 8,05 | **−3,09** |
+
+4 de 4 models, 12 de 12 llavors: la perplexitat de retenció baixa amb B, amb
+variància entre llavors menyspreable (std < 0,04). El tokenitzador català-aware
+(salamandra) és el que més baixa.
+
+### Comportament (parells mínims): B no guanya en cap model
+
+| model | acc A nadiu | acc B morfèmic | Δ (B − A) |
+| --- | ---: | ---: | ---: |
+| gemma-2-2b | 0,99 | 0,78 | **−0,21** |
+| Qwen2-1.5B | 0,967 | 0,967 | 0,00 |
+| Qwen3.5-4B | 1,000 | 0,633 | **−0,37** |
+| salamandra-2b | 1,000 | 1,000 | 0,00 |
+
+Cap dels 4 models mostra B > A: dos empaten (al sostre) i dos es **degraden**
+clarament.
+
+### Conclusió: una dissociació neta
+
+> El guany de perplexitat de la segmentació morfèmica **no es tradueix en
+> comportament gramatical** —i en la meitat dels models l'empitjora.
+
+La perplexitat més baixa de B reflecteix **regularitat**, no comprensió: després
+d'una arrel, el morfema (`-ment`) és gairebé determinista, i una seqüència
+morfèmica és intrínsecament més predictible per token. Quan es mesura la tasca
+neta —triar la frase gramatical, sobre les mateixes frases, cada model sota la
+seva pròpia segmentació— el reentrenament morfèmic no aporta benefici. **La
+hipòtesi forta (la geometria de Part 1 → comportament) no se sosté.**
+
+**Matís honest:** la condició nadiua A ja parteix del sostre (0,97–1,00) en aquests
+parells mínims, cosa que deixa poc marge perquè B la superi. Però la degradació de
+B en gemma-2-2b (−0,21) i Qwen3.5-4B (−0,37) és real i no atribuïble al sostre:
+l'empalmament morfèmic per ids encara perjudica, sobretot el model gran —
+consistent amb la troballa de Part 1 que aquest tall és *out-of-distribution*.
+
+**Implicació per a la visió (Part 3).** El disseny preveia que una Part 2 nul·la en
+comportament falsa de manera barata la ruta morfèmica cap a l'equitat entre
+llengües indoeuropees. L'empalmament ingenu de peces de subparaula no és el camí;
+un tokenitzador *genuïnament* morfèmic (no per ids) seria una recerca diferent.
+
+**Pesos i reproducció.** Els 24 models reentrenats són a Hugging Face, cadascun amb
+la seva *model card* en català i les corbes d'entrenament:
+`huggingface.co/xaviviro/morfo-part2-{model}-{A|B}-s{42,43,44}`. Codi a `part2/`,
+resultats a `part2/out/part2_results.csv` i corbes A vs B per model a
+`part2/out/figs/`.
 
 ---
 

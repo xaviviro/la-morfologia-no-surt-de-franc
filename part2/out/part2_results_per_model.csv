@@ -1,0 +1,5 @@
+model,mean_delta,std_delta,n_seeds
+BSC-LT/salamandra-2b,0.0,0.0,3
+Qwen/Qwen2-1.5B,0.0,0.033333333333333326,3
+Qwen/Qwen3.5-4B-Base,-0.3666666666666667,0.0,3
+google/gemma-2-2b,-0.21111111111111105,0.019245008972987525,3
